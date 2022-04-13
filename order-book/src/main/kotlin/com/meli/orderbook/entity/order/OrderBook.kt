@@ -1,15 +1,12 @@
-package com.meli.orderbook.entity
+package com.meli.orderbook.entity.order
 
-import com.meli.orderbook.entity.Order.Type.BUY
-import com.meli.orderbook.entity.Order.Type.SELL
+import com.meli.orderbook.entity.order.Order.Type.BUY
+import com.meli.orderbook.entity.order.Order.Type.SELL
 
 class OrderBook(
-    asks: List<Order>,
-    bids: List<Order>
+    val asks: List<Order>,
+    val bids: List<Order>
 ) {
-
-    val asks = asks.sortedWith(compareBy({ it.price }, { it.creationDate }))
-    val bids = bids.sortedWith(compareByDescending<Order> { it.price }.thenBy { it.creationDate })
 
     fun findMatchingOrders(order: Order): List<Order> {
         return when (order.type) {

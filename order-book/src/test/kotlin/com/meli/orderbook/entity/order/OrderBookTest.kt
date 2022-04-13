@@ -1,8 +1,10 @@
-package com.meli.orderbook.entity
+package com.meli.orderbook.entity.order
 
-import com.meli.orderbook.entity.Order.State.IN_TRADE
-import com.meli.orderbook.entity.Order.Type.BUY
-import com.meli.orderbook.entity.Order.Type.SELL
+import com.meli.orderbook.entity.order.Order
+import com.meli.orderbook.entity.order.Order.State.IN_TRADE
+import com.meli.orderbook.entity.order.Order.Type.BUY
+import com.meli.orderbook.entity.order.Order.Type.SELL
+import com.meli.orderbook.entity.order.OrderBook
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
@@ -13,20 +15,20 @@ class OrderBookTest {
     private val dateTime = now()
 
     @Test
-    fun `Should create an order-book with sell-orders in ascending order and buy-orders in descending order`() {
+    fun `Should create an order-book with sell-orders and buy-orders`() {
         val orderBook = createOrderBook()
 
         assertEquals(4, orderBook.asks.size)
-        assertEquals(2L, orderBook.asks[0].id)
-        assertEquals(1L, orderBook.asks[1].id)
-        assertEquals(4L, orderBook.asks[2].id)
-        assertEquals(3L, orderBook.asks[3].id)
+        assertEquals(1L, orderBook.asks[0].id)
+        assertEquals(2L, orderBook.asks[1].id)
+        assertEquals(3L, orderBook.asks[2].id)
+        assertEquals(4L, orderBook.asks[3].id)
 
         assertEquals(4, orderBook.bids.size)
-        assertEquals(4L, orderBook.bids[0].id)
+        assertEquals(1L, orderBook.bids[0].id)
         assertEquals(2L, orderBook.bids[1].id)
         assertEquals(3L, orderBook.bids[2].id)
-        assertEquals(1L, orderBook.bids[3].id)
+        assertEquals(4L, orderBook.bids[3].id)
     }
 
     @Test

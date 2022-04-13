@@ -1,4 +1,4 @@
-package com.meli.orderbook.entity
+package com.meli.orderbook.entity.order
 
 import java.math.BigDecimal
 import java.time.LocalDateTime
