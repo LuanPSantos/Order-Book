@@ -58,44 +58,19 @@ class OrderTest {
     }
 
     @Test
-    fun `Should not discount an amount of size that is greater than the available`() {
-        val order = BuyOrder(BigDecimal.TEN, 1, 1, dateTime, 1)
-
-        val discountError = assertThrows<java.lang.IllegalArgumentException> {
-            order.discountSize(10)
-        }
-
-        assertEquals("Invalid discount size", discountError.message)
-    }
-
-    @Test
-    fun `Should not discount an negative amount of size that is greater than the available`() {
-        val order = BuyOrder(BigDecimal.TEN, 1, 1, dateTime, 1)
-
-        val discountError = assertThrows<java.lang.IllegalArgumentException> {
-            order.discountSize(-10)
-        }
-
-        assertEquals("Invalid discount size", discountError.message)
-    }
-
-    @Test
-    fun `Should discount an amount of size that is less than the available and keep the order in trade`() {
+    fun `Should retrive all sizes and close the order`() {
         val order = BuyOrder(BigDecimal.TEN, 10, 1, dateTime, 1)
 
-        order.discountSize(5)
+        val size = order.getAllSizesAndCloseOrder()
 
-        assertEquals(5, order.size)
-        assertEquals(IN_TRADE, order.getState())
-    }
+        assertEquals(10, size)
 
-    @Test
-    fun `Should discount an amount of size that is equal than the available and set order as done`() {
-        val order = BuyOrder(BigDecimal.TEN, 10, 1, dateTime, 1)
-
-        order.discountSize(10)
-
+        assertEquals(BigDecimal.TEN, order.price)
         assertEquals(0, order.size)
+        assertEquals(1, order.walletId)
+        assertEquals(dateTime, order.creationDate)
+        assertEquals(1, order.id)
+        assertEquals(BUY, order.type)
         assertEquals(DONE, order.getState())
     }
 

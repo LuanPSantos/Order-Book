@@ -8,30 +8,33 @@ class Wallet(
     private var amountOfAssets: Int
 ) {
     fun subtractAssets(size: Int) {
-        if (size > amountOfAssets) {
-            throw IllegalArgumentException("Insuficient amount of asset")
+        if (size > amountOfAssets || size <= 0) {
+            throw IllegalArgumentException("Invalid size to subtract")
         }
 
         this.amountOfAssets -= size
     }
 
-    fun depositMoney(amountOfMoney: BigDecimal) {
-        this.amountOfMoney.plus(amountOfMoney)
-    }
+    fun depositAssets(size: Int) {
+        if (size < 0) {
+            throw IllegalArgumentException("Invalid size to deposit")
+        }
 
-    fun getTheAmountOfMoney(): BigDecimal {
-        return this.amountOfMoney
+        this.amountOfAssets += size
     }
 
     fun getTheAmountOfAssets(): Int {
         return this.amountOfAssets
     }
 
-    fun depositAssets(size: Int) {
-        if(size < 0) {
-            throw IllegalArgumentException("Depositing negative size")
+    fun depositMoney(deposit: BigDecimal) {
+        if(deposit < BigDecimal.ZERO) {
+            throw IllegalArgumentException("Invalid deposit value")
         }
+        this.amountOfMoney += deposit
+    }
 
-        this.amountOfAssets += size
+    fun getTheAmountOfMoney(): BigDecimal {
+        return this.amountOfMoney
     }
 }

@@ -23,16 +23,12 @@ abstract class Order(
         return this.state
     }
 
-    fun discountSize(size: Int) {
-        if (size < 0 || size > this.size) {
-            throw IllegalArgumentException("Invalid discount size")
-        }
+    fun getAllSizesAndCloseOrder(): Int {
+        val allSizes = this.size
+        this.state = State.DONE
+        this.size = 0
 
-        this.size -= size
-
-        if(this.size == 0) {
-            this.state = State.DONE
-        }
+        return allSizes
     }
 
     enum class Type {

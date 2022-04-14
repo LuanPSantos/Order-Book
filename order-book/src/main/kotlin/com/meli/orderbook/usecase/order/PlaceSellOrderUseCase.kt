@@ -26,7 +26,7 @@ class PlaceSellOrderUseCase(
         if (matchedBuyOrders.isNotEmpty()) {
             for (buyOrder in matchedBuyOrders) {
                 if (sellOrder.canTradeWith(buyOrder)) {
-                    tradeService.execute(sellOrder, buyOrder)
+                    tradeService.executeSell(sellOrder, buyOrder)
                 }
             }
 
