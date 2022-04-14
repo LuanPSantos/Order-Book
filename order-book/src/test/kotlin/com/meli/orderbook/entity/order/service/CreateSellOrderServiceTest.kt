@@ -1,11 +1,10 @@
 package com.meli.orderbook.entity.order.service
 
 import com.meli.orderbook.entity.order.gateway.OrderCommandGateway
-import com.meli.orderbook.entity.order.model.Order
 import com.meli.orderbook.entity.order.model.Order.State.IN_TRADE
 import com.meli.orderbook.entity.order.model.Order.Type.SELL
 import com.meli.orderbook.entity.order.model.SellOrder
-import com.meli.orderbook.entity.wallet.Wallet
+import com.meli.orderbook.entity.wallet.model.Wallet
 import com.meli.orderbook.entity.wallet.gateway.WalletCommandGateway
 import com.meli.orderbook.entity.wallet.gateway.WalletQueryGateway
 import io.mockk.*

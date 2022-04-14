@@ -4,6 +4,7 @@ import com.meli.orderbook.entity.order.model.BuyOrder
 import com.meli.orderbook.entity.order.model.SellOrder
 import com.meli.orderbook.entity.wallet.gateway.WalletCommandGateway
 import com.meli.orderbook.entity.wallet.gateway.WalletQueryGateway
+import com.meli.orderbook.entity.wallet.model.Wallet
 
 class TradeService(
     private val walletQueryGateway: WalletQueryGateway,
@@ -15,6 +16,36 @@ class TradeService(
         val sellerWallet = walletQueryGateway.findById(sellOrder.walletId)
         val buyerWallet = walletQueryGateway.findById(buyOrder.walletId)
 
-        //sellOrder.addMonay(buyOrder.price.multiply(buyOrder.size.toBigDecimal()))
+        depositMoneyToSeller(sellerWallet, sellOrder, buyOrder)
+        depositAssetToBuyer(buyerWallet, sellOrder, buyOrder)
+
+    }
+
+    private fun depositMoneyToSeller(
+        sellerWallet: Wallet,
+        sellOrder: SellOrder,
+        buyOrder: BuyOrder
+    ) {
+        if (thereIsMoreToSellThanToBuy(sellOrder, buyOrder)) {
+            sellerWallet.depositMoney(buyOrder.price.multiply(buyOrder.size.toBigDecimal()))
+        } else {
+            sellerWallet.depositMoney(buyOrder.price.multiply(sellOrder.size.toBigDecimal()))
+        }
+    }
+
+    private fun thereIsMoreToSellThanToBuy(sellOrder: SellOrder, buyOrder: BuyOrder): Boolean {
+        return sellOrder.size - buyOrder.size > 0
+    }
+
+    private fun depositAssetToBuyer(
+        buyerWallet: Wallet,
+        sellOrder: SellOrder,
+        buyOrder: BuyOrder
+    ) {
+        if (thereIsMoreToSellThanToBuy(sellOrder, buyOrder)) {
+            buyerWallet.depositAssets(buyOrder.size)
+        } else {
+            buyerWallet.depositAssets(sellOrder.size)
+        }
     }
 }
