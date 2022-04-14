@@ -1,6 +1,6 @@
 package com.meli.orderbook.usecase.order
 
-import com.meli.orderbook.entity.order.OrderBook
+import com.meli.orderbook.entity.order.model.OrderBook
 import com.meli.orderbook.entity.order.gateway.OrderBookQueryGateway
 
 class GetOrderBookUseCase(
