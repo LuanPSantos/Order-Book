@@ -14,7 +14,7 @@ abstract class Order(
 ) {
 
     init {
-        if(price < BigDecimal.ZERO || size < 0) {
+        if (price < BigDecimal.ZERO || size < 0) {
             throw IllegalArgumentException("Invalid order values (price or size)")
         }
     }
@@ -24,8 +24,17 @@ abstract class Order(
     }
 
     fun getAllSizesAndCloseOrder(): Int {
+        this.state = State.CLOSED
+        return getAllSizes()
+    }
+
+    fun getAllSizesAndCancelOrder(): Int {
+        this.state = State.CANCELLED
+        return getAllSizes()
+    }
+
+    private fun getAllSizes(): Int {
         val allSizes = this.size
-        this.state = State.DONE
         this.size = 0
 
         return allSizes
@@ -36,6 +45,6 @@ abstract class Order(
     }
 
     enum class State {
-        IN_TRADE, CANCELLED, DONE
+        IN_TRADE, CANCELLED, CLOSED
     }
 }

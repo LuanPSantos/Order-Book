@@ -1,7 +1,6 @@
 package com.meli.orderbook.entity.order.model
 
-import com.meli.orderbook.entity.order.model.Order.State.DONE
-import com.meli.orderbook.entity.order.model.Order.State.IN_TRADE
+import com.meli.orderbook.entity.order.model.Order.State.*
 import com.meli.orderbook.entity.order.model.Order.Type.*
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
@@ -71,7 +70,24 @@ class OrderTest {
         assertEquals(dateTime, order.creationDate)
         assertEquals(1, order.id)
         assertEquals(BUY, order.type)
-        assertEquals(DONE, order.getState())
+        assertEquals(CLOSED, order.getState())
+    }
+
+    @Test
+    fun `Should retrive all sizes and cancel the order`() {
+        val order = BuyOrder(BigDecimal.TEN, 10, 1, dateTime, 1)
+
+        val size = order.getAllSizesAndCancelOrder()
+
+        assertEquals(10, size)
+
+        assertEquals(BigDecimal.TEN, order.price)
+        assertEquals(0, order.size)
+        assertEquals(1, order.walletId)
+        assertEquals(dateTime, order.creationDate)
+        assertEquals(1, order.id)
+        assertEquals(BUY, order.type)
+        assertEquals(CANCELLED, order.getState())
     }
 
     @Test
@@ -86,6 +102,26 @@ class OrderTest {
     fun `Should not let sell-order trade with an cheaper buy-order`() {
         val sellOrder = SellOrder(BigDecimal.TEN, 10, 1, dateTime, 1)
         val buyOrder = BuyOrder(BigDecimal.ONE, 10, 2, dateTime, 2)
+
+        assertFalse(sellOrder.canTradeWith(buyOrder))
+    }
+
+    @Test
+    fun `Should not let sell-order trade with an buy-order that is closed`() {
+        val sellOrder = SellOrder(BigDecimal.TEN, 10, 1, dateTime, 1)
+        val buyOrder = BuyOrder(BigDecimal.ONE, 10, 2, dateTime, 2)
+
+        buyOrder.getAllSizesAndCloseOrder()
+
+        assertFalse(sellOrder.canTradeWith(buyOrder))
+    }
+
+    @Test
+    fun `Should not let sell-order trade with an buy-order that is cancelled`() {
+        val sellOrder = SellOrder(BigDecimal.TEN, 10, 1, dateTime, 1)
+        val buyOrder = BuyOrder(BigDecimal.ONE, 10, 2, dateTime, 2)
+
+        buyOrder.getAllSizesAndCancelOrder()
 
         assertFalse(sellOrder.canTradeWith(buyOrder))
     }
