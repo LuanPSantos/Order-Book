@@ -77,7 +77,8 @@ class OrderTest {
     fun `Should retrive all sizes and cancel the order`() {
         val order = BuyOrder(BigDecimal.TEN, 10, 1, dateTime, 1)
 
-        val size = order.cancel().subtractAllSize()
+        val size = order.subtractAllSize()
+        order.cancel()
 
         assertEquals(10, size)
 

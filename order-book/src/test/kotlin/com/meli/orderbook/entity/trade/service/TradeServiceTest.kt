@@ -18,13 +18,11 @@ import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.Arguments.arguments
 import org.junit.jupiter.params.provider.MethodSource
 import java.math.BigDecimal
-import java.math.BigDecimal.TEN
 import java.time.LocalDateTime
 import java.time.LocalDateTime.now
 import java.util.stream.Stream
@@ -122,59 +120,87 @@ class TradeServiceTest {
                 pricesMatchedAndSizeMetched(),
                 pricesMatchedAndHasMoreToSellThenToBuy(),
                 pricesMatchedAndHasLessToSellThenToBuy(),
-                sizeMatchedAndPricesDidNot()
+                sizeMatchedAndPricesDidNot(),
+                hasMoreToSellThenToBuyAndPricesDidNot(),
+                hasLessToSellThenToBuyAndPricesDidNot()
             )
         }
 
         private fun pricesMatchedAndSizeMetched(): Arguments {
             return arguments(
-                Wallet(1, TEN, 10),
-                Wallet(2, TEN, 10),
-                SellOrder(TEN, 10, 1, dateTime, 1, IN_TRADE),
-                BuyOrder(TEN, 10, 2, dateTime, 2, IN_TRADE),
+                Wallet(1, BigDecimal("10"), 10),
+                Wallet(2, BigDecimal("10"), 10),
+                SellOrder(BigDecimal("10"), 10, 1, dateTime, 1, IN_TRADE),
+                BuyOrder(BigDecimal("10"), 10, 2, dateTime, 2, IN_TRADE),
                 Wallet(1, BigDecimal("110"), 10),
-                Wallet(2, TEN, 20),
-                SellOrder(TEN, 0, 1, dateTime, 1, CLOSED),
-                BuyOrder(TEN, 0, 2, dateTime, 2, CLOSED)
+                Wallet(2, BigDecimal("10"), 20),
+                SellOrder(BigDecimal("10"), 0, 1, dateTime, 1, CLOSED),
+                BuyOrder(BigDecimal("10"), 0, 2, dateTime, 2, CLOSED)
             )
         }
 
         private fun pricesMatchedAndHasMoreToSellThenToBuy(): Arguments {
             return arguments(
-                Wallet(1, TEN, 10),
-                Wallet(2, TEN, 10),
-                SellOrder(TEN, 15, 1, dateTime, 1, IN_TRADE),
-                BuyOrder(TEN, 10, 2, dateTime, 2, IN_TRADE),
+                Wallet(1, BigDecimal("10"), 10),
+                Wallet(2, BigDecimal("10"), 10),
+                SellOrder(BigDecimal("10"), 15, 1, dateTime, 1, IN_TRADE),
+                BuyOrder(BigDecimal("10"), 10, 2, dateTime, 2, IN_TRADE),
                 Wallet(1, BigDecimal("110"), 10),
-                Wallet(2, TEN, 20),
-                SellOrder(TEN, 5, 1, dateTime, 1, IN_TRADE),
-                BuyOrder(TEN, 0, 2, dateTime, 2, CLOSED)
+                Wallet(2, BigDecimal("10"), 20),
+                SellOrder(BigDecimal("10"), 5, 1, dateTime, 1, IN_TRADE),
+                BuyOrder(BigDecimal("10"), 0, 2, dateTime, 2, CLOSED)
             )
         }
 
         private fun pricesMatchedAndHasLessToSellThenToBuy(): Arguments {
             return arguments(
-                Wallet(1, TEN, 10),
-                Wallet(2, TEN, 10),
-                SellOrder(TEN, 10, 1, dateTime, 1, IN_TRADE),
-                BuyOrder(TEN, 15, 2, dateTime, 2, IN_TRADE),
+                Wallet(1, BigDecimal("10"), 10),
+                Wallet(2, BigDecimal("10"), 10),
+                SellOrder(BigDecimal("10"), 10, 1, dateTime, 1, IN_TRADE),
+                BuyOrder(BigDecimal("10"), 15, 2, dateTime, 2, IN_TRADE),
                 Wallet(1, BigDecimal("110"), 10),
-                Wallet(2, TEN, 20),
-                SellOrder(TEN, 0, 1, dateTime, 1, CLOSED),
-                BuyOrder(TEN, 5, 2, dateTime, 2, IN_TRADE)
+                Wallet(2, BigDecimal("10"), 20),
+                SellOrder(BigDecimal("10"), 0, 1, dateTime, 1, CLOSED),
+                BuyOrder(BigDecimal("10"), 5, 2, dateTime, 2, IN_TRADE)
             )
         }
 
         private fun sizeMatchedAndPricesDidNot(): Arguments {
             return arguments(
-                Wallet(1, TEN, 10),
-                Wallet(2, TEN, 10),
+                Wallet(1, BigDecimal("10"), 10),
+                Wallet(2, BigDecimal("10"), 10),
                 SellOrder(BigDecimal("9"), 10, 1, dateTime, 1, IN_TRADE),
-                BuyOrder(TEN, 10, 2, dateTime, 2, IN_TRADE),
+                BuyOrder(BigDecimal("10"), 10, 2, dateTime, 2, IN_TRADE),
                 Wallet(1, BigDecimal("100"), 10),
-                Wallet(2, TEN, 20),
+                Wallet(2, BigDecimal("20"), 20),
                 SellOrder(BigDecimal("9"), 0, 1, dateTime, 1, CLOSED),
-                BuyOrder(TEN, 0, 2, dateTime, 2, CLOSED)
+                BuyOrder(BigDecimal("10"), 0, 2, dateTime, 2, CLOSED)
+            )
+        }
+
+        private fun hasMoreToSellThenToBuyAndPricesDidNot(): Arguments {
+            return arguments(
+                Wallet(1, BigDecimal("10"), 10),
+                Wallet(2, BigDecimal("10"), 10),
+                SellOrder(BigDecimal("9"), 15, 1, dateTime, 1, IN_TRADE),
+                BuyOrder(BigDecimal("10"), 10, 2, dateTime, 2, IN_TRADE),
+                Wallet(1, BigDecimal("100"), 10),
+                Wallet(2, BigDecimal("20"), 20),
+                SellOrder(BigDecimal("9"), 5, 1, dateTime, 1, IN_TRADE),
+                BuyOrder(BigDecimal("10"), 0, 2, dateTime, 2, CLOSED)
+            )
+        }
+
+        private fun hasLessToSellThenToBuyAndPricesDidNot(): Arguments {
+            return arguments(
+                Wallet(1, BigDecimal("10"), 10),
+                Wallet(2, BigDecimal("10"), 10),
+                SellOrder(BigDecimal("9"), 10, 1, dateTime, 1, IN_TRADE),
+                BuyOrder(BigDecimal("10"), 15, 2, dateTime, 2, IN_TRADE),
+                Wallet(1, BigDecimal("100"), 10),
+                Wallet(2, BigDecimal("20"), 20),
+                SellOrder(BigDecimal("9"), 0, 1, dateTime, 1, CLOSED),
+                BuyOrder(BigDecimal("10"), 5, 2, dateTime, 2, IN_TRADE)
             )
         }
     }

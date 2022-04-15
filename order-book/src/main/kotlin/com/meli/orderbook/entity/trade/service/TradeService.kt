@@ -74,7 +74,7 @@ class TradeService(
                 sellOrder,
                 buyOrder
             )
-        } else if (thereHasLessToSellThanToBuy(sellOrder, buyOrder)) {
+        } else {
 
             val amountOfSellingAssets = sellOrder.size
 
@@ -85,13 +85,6 @@ class TradeService(
                 sellOrder,
                 buyOrder
             )
-        } else {
-            val amountOfAssets = sellOrder.size.toBigDecimal()
-            val totalInTransaction = sellOrder.price.multiply(amountOfAssets)
-
-            sellerWallet.depositMoney(totalInTransaction)
-
-            totalInTransaction
         }
     }
 
