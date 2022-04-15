@@ -4,9 +4,15 @@ import java.math.BigDecimal
 
 class Wallet(
     val id: Long,
-    private var amountOfMoney: BigDecimal,
-    private var amountOfAssets: Int
+    amountOfMoney: BigDecimal,
+    amountOfAssets: Int
 ) {
+
+    var amountOfMoney: BigDecimal = amountOfMoney
+        private set
+    var amountOfAssets: Int = amountOfAssets
+        private set
+
     fun subtractAssets(size: Int) {
         if (size > amountOfAssets || size <= 0) {
             throw IllegalArgumentException("Invalid size to subtract")
@@ -23,18 +29,10 @@ class Wallet(
         this.amountOfAssets += size
     }
 
-    fun getTheAmountOfAssets(): Int {
-        return this.amountOfAssets
-    }
-
     fun depositMoney(deposit: BigDecimal) {
-        if(deposit < BigDecimal.ZERO) {
+        if (deposit < BigDecimal.ZERO) {
             throw IllegalArgumentException("Invalid deposit value")
         }
         this.amountOfMoney += deposit
-    }
-
-    fun getTheAmountOfMoney(): BigDecimal {
-        return this.amountOfMoney
     }
 }

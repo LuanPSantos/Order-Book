@@ -13,13 +13,13 @@ class CreateSellOrderService(
 ) {
 
     @Transactional
-    fun create(sellOrder: SellOrder) {
+    fun create(sellOrder: SellOrder): SellOrder {
         val sellerWallet = walletQueryGateway.findById(sellOrder.walletId)
 
         sellerWallet.subtractAssets(sellOrder.size)
 
         walletCommandGateway.update(sellerWallet)
 
-        orderCommandGateway.create(sellOrder)
+        return orderCommandGateway.create(sellOrder) as SellOrder
     }
 }

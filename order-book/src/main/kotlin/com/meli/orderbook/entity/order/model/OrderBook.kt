@@ -7,7 +7,7 @@ class OrderBook(
     val asks = asks.sortedWith(compareBy({ it.price }, { it.creationDate }))
     val bids = bids.sortedWith(compareByDescending<BuyOrder> { it.price }.thenBy { it.creationDate })
 
-    fun findMatchingSellsOrder(order: BuyOrder): List<SellOrder> {
+    fun findMatchingSellOrders(order: BuyOrder): List<SellOrder> {
         return asks.filter { it.price <= order.price }
     }
 

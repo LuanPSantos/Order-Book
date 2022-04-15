@@ -10,10 +10,11 @@ class SellOrder(
     size: Int,
     walletId: Long,
     creationDate: LocalDateTime = now(),
-    id: Long? = null
-) : Order(Type.SELL, price, size, creationDate, walletId, id = id) {
+    id: Long? = null,
+    state: State = State.CREATED
+) : Order(Type.SELL, price, size, creationDate, walletId, state, id) {
 
     fun canTradeWith(buyOrder: BuyOrder): Boolean {
-        return buyOrder.size > 0 && buyOrder.price >= this.price && this.getState() == IN_TRADE
+        return buyOrder.size > 0 && buyOrder.price >= this.price && this.state == IN_TRADE
     }
 }

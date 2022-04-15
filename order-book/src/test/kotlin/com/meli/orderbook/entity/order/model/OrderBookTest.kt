@@ -32,9 +32,9 @@ class OrderBookTest {
     @Test
     fun `Should find matching sell-orders for a given buy-order`() {
         val orderBook = createOrderBook()
-        val buyOrder = BuyOrder(BigDecimal("200"), 5, 5, now())
+        val buyOrder = BuyOrder(BigDecimal("200"), 5, 5, now(), state = IN_TRADE)
 
-        val matchingSellOrders = orderBook.findMatchingSellsOrder(buyOrder)
+        val matchingSellOrders = orderBook.findMatchingSellOrders(buyOrder)
 
         assertEquals(2, matchingSellOrders.size)
 
@@ -42,7 +42,7 @@ class OrderBookTest {
         assertEquals(1, matchingSellOrders[0].size)
         assertEquals(2, matchingSellOrders[0].walletId)
         assertEquals(BigDecimal("100"), matchingSellOrders[0].price)
-        assertEquals(IN_TRADE, matchingSellOrders[0].getState())
+        assertEquals(IN_TRADE, matchingSellOrders[0].state)
         assertEquals(SELL, matchingSellOrders[0].type)
         assertEquals(dateTime.plusMinutes(2), matchingSellOrders[0].creationDate)
 
@@ -50,7 +50,7 @@ class OrderBookTest {
         assertEquals(5, matchingSellOrders[1].size)
         assertEquals(1, matchingSellOrders[1].walletId)
         assertEquals(BigDecimal("200"), matchingSellOrders[1].price)
-        assertEquals(IN_TRADE, matchingSellOrders[1].getState())
+        assertEquals(IN_TRADE, matchingSellOrders[1].state)
         assertEquals(SELL, matchingSellOrders[1].type)
         assertEquals(dateTime.plusMinutes(3), matchingSellOrders[1].creationDate)
     }
@@ -58,7 +58,7 @@ class OrderBookTest {
     @Test
     fun `Should find matching buy-orders for a given sell-order`() {
         val orderBook = createOrderBook()
-        val sellOrder = SellOrder(BigDecimal("220"), 5, 5L, now())
+        val sellOrder = SellOrder(BigDecimal("220"), 5, 5L, now(), state = IN_TRADE)
 
         val matchingBuyOrders = orderBook.findMatchingBuyOrders(sellOrder)
 
@@ -68,7 +68,7 @@ class OrderBookTest {
         assertEquals(2, matchingBuyOrders[0].size)
         assertEquals(4, matchingBuyOrders[0].walletId)
         assertEquals(BigDecimal("355"), matchingBuyOrders[0].price)
-        assertEquals(IN_TRADE, matchingBuyOrders[0].getState())
+        assertEquals(IN_TRADE, matchingBuyOrders[0].state)
         assertEquals(BUY, matchingBuyOrders[0].type)
         assertEquals(dateTime.plusMinutes(1), matchingBuyOrders[0].creationDate)
 
@@ -76,7 +76,7 @@ class OrderBookTest {
         assertEquals(6, matchingBuyOrders[1].size)
         assertEquals(2, matchingBuyOrders[1].walletId)
         assertEquals(BigDecimal("220"), matchingBuyOrders[1].price)
-        assertEquals(IN_TRADE, matchingBuyOrders[1].getState())
+        assertEquals(IN_TRADE, matchingBuyOrders[1].state)
         assertEquals(BUY, matchingBuyOrders[1].type)
         assertEquals(dateTime.plusMinutes(2), matchingBuyOrders[1].creationDate)
 
@@ -85,7 +85,7 @@ class OrderBookTest {
         assertEquals(7, matchingBuyOrders[2].size)
         assertEquals(3, matchingBuyOrders[2].walletId)
         assertEquals(BigDecimal("220"), matchingBuyOrders[2].price)
-        assertEquals(IN_TRADE, matchingBuyOrders[2].getState())
+        assertEquals(IN_TRADE, matchingBuyOrders[2].state)
         assertEquals(BUY, matchingBuyOrders[2].type)
         assertEquals(dateTime.plusMinutes(3), matchingBuyOrders[2].creationDate)
     }
@@ -94,16 +94,16 @@ class OrderBookTest {
 
         return OrderBook(
             listOf(
-                SellOrder(BigDecimal("200"), 5, 1, dateTime.plusMinutes(3), 1),
-                SellOrder(BigDecimal("100"), 1, 2, dateTime.plusMinutes(2), 2),
-                SellOrder(BigDecimal("300"), 2, 3, dateTime.plusMinutes(4), 3),
-                SellOrder(BigDecimal("300"), 4, 4, dateTime.plusMinutes(1), 4)
+                SellOrder(BigDecimal("200"), 5, 1, dateTime.plusMinutes(3), 1, IN_TRADE),
+                SellOrder(BigDecimal("100"), 1, 2, dateTime.plusMinutes(2), 2, IN_TRADE),
+                SellOrder(BigDecimal("300"), 2, 3, dateTime.plusMinutes(4), 3, IN_TRADE),
+                SellOrder(BigDecimal("300"), 4, 4, dateTime.plusMinutes(1), 4, IN_TRADE)
             ),
             listOf(
-                BuyOrder(BigDecimal("110"), 4, 1L, dateTime.plusMinutes(4), 1),
-                BuyOrder(BigDecimal("220"), 6, 2L, dateTime.plusMinutes(2), 2),
-                BuyOrder(BigDecimal("220"), 7, 3L, dateTime.plusMinutes(3), 3),
-                BuyOrder(BigDecimal("355"), 2, 4L, dateTime.plusMinutes(1), 4)
+                BuyOrder(BigDecimal("110"), 4, 1L, dateTime.plusMinutes(4), 1, IN_TRADE),
+                BuyOrder(BigDecimal("220"), 6, 2L, dateTime.plusMinutes(2), 2, IN_TRADE),
+                BuyOrder(BigDecimal("220"), 7, 3L, dateTime.plusMinutes(3), 3, IN_TRADE),
+                BuyOrder(BigDecimal("355"), 2, 4L, dateTime.plusMinutes(1), 4, IN_TRADE)
             )
         )
     }

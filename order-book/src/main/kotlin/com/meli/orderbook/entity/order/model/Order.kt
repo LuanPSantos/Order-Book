@@ -6,12 +6,18 @@ import java.time.LocalDateTime
 abstract class Order(
     val type: Type,
     val price: BigDecimal,
-    var size: Int,
+    size: Int,
     val creationDate: LocalDateTime,
     val walletId: Long,
-    private var state: State = State.IN_TRADE,
+    state: State = State.CREATED,
     val id: Long? = null
 ) {
+
+    var state: State = state
+        private set
+
+    var size: Int = size
+        private set
 
     init {
         if (price < BigDecimal.ZERO || size < 0) {
@@ -19,25 +25,35 @@ abstract class Order(
         }
     }
 
-    fun getState(): State {
-        return this.state
-    }
-
-    fun getAllSizesAndCloseOrder(): Int {
+    fun close(): Order {
         this.state = State.CLOSED
-        return getAllSizes()
+        return this
     }
 
-    fun getAllSizesAndCancelOrder(): Int {
+    fun cancel(): Order {
         this.state = State.CANCELLED
-        return getAllSizes()
+        return this
     }
 
-    private fun getAllSizes(): Int {
+    fun enableToTrade() {
+        this.state = State.IN_TRADE
+    }
+
+    fun subtractAllSize(): Int {
+        close()
+
         val allSizes = this.size
         this.size = 0
 
         return allSizes
+    }
+
+    fun subractSizes(sizes: Int) {
+        if (sizes < 0) {
+            throw IllegalArgumentException("Subtract negative value not allowed")
+        }
+
+        this.size -= sizes
     }
 
     enum class Type {
@@ -45,6 +61,6 @@ abstract class Order(
     }
 
     enum class State {
-        IN_TRADE, CANCELLED, CLOSED
+        CREATED, IN_TRADE, CANCELLED, CLOSED
     }
 }

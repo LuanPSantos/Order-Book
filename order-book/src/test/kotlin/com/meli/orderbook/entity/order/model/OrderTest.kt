@@ -22,7 +22,7 @@ class OrderTest {
         assertEquals(dateTime, sellOrder.creationDate)
         assertEquals(1, sellOrder.id)
         assertEquals(SELL, sellOrder.type)
-        assertEquals(IN_TRADE, sellOrder.getState())
+        assertEquals(CREATED, sellOrder.state)
     }
 
     @Test
@@ -35,7 +35,7 @@ class OrderTest {
         assertEquals(dateTime, sellOrder.creationDate)
         assertEquals(1, sellOrder.id)
         assertEquals(BUY, sellOrder.type)
-        assertEquals(IN_TRADE, sellOrder.getState())
+        assertEquals(CREATED, sellOrder.state)
     }
 
     @Test
@@ -60,7 +60,7 @@ class OrderTest {
     fun `Should retrive all sizes and close the order`() {
         val order = BuyOrder(BigDecimal.TEN, 10, 1, dateTime, 1)
 
-        val size = order.getAllSizesAndCloseOrder()
+        val size = order.close().subtractAllSize()
 
         assertEquals(10, size)
 
@@ -70,14 +70,14 @@ class OrderTest {
         assertEquals(dateTime, order.creationDate)
         assertEquals(1, order.id)
         assertEquals(BUY, order.type)
-        assertEquals(CLOSED, order.getState())
+        assertEquals(CLOSED, order.state)
     }
 
     @Test
     fun `Should retrive all sizes and cancel the order`() {
         val order = BuyOrder(BigDecimal.TEN, 10, 1, dateTime, 1)
 
-        val size = order.getAllSizesAndCancelOrder()
+        val size = order.cancel().subtractAllSize()
 
         assertEquals(10, size)
 
@@ -87,7 +87,7 @@ class OrderTest {
         assertEquals(dateTime, order.creationDate)
         assertEquals(1, order.id)
         assertEquals(BUY, order.type)
-        assertEquals(CANCELLED, order.getState())
+        assertEquals(CANCELLED, order.state)
     }
 
     @Test
@@ -111,7 +111,7 @@ class OrderTest {
         val sellOrder = SellOrder(BigDecimal.TEN, 10, 1, dateTime, 1)
         val buyOrder = BuyOrder(BigDecimal.ONE, 10, 2, dateTime, 2)
 
-        buyOrder.getAllSizesAndCloseOrder()
+        buyOrder.close().subtractAllSize()
 
         assertFalse(sellOrder.canTradeWith(buyOrder))
     }
@@ -121,15 +121,15 @@ class OrderTest {
         val sellOrder = SellOrder(BigDecimal.TEN, 10, 1, dateTime, 1)
         val buyOrder = BuyOrder(BigDecimal.ONE, 10, 2, dateTime, 2)
 
-        buyOrder.getAllSizesAndCancelOrder()
+        buyOrder.cancel().subtractAllSize()
 
         assertFalse(sellOrder.canTradeWith(buyOrder))
     }
 
     @Test
     fun `Should let sell-order trade with an buy-order`() {
-        val sellOrder = SellOrder(BigDecimal.TEN, 10, 1, dateTime, 1)
-        val buyOrder = BuyOrder(BigDecimal.TEN, 5, 2, dateTime, 2)
+        val sellOrder = SellOrder(BigDecimal.TEN, 10, 1, dateTime,  1, IN_TRADE)
+        val buyOrder = BuyOrder(BigDecimal.TEN, 5, 2, dateTime,  2, IN_TRADE)
 
         assertTrue(sellOrder.canTradeWith(buyOrder))
     }

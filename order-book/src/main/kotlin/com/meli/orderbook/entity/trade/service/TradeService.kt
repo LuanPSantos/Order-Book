@@ -6,8 +6,8 @@ import com.meli.orderbook.entity.order.model.Order
 import com.meli.orderbook.entity.order.model.Order.Type.BUY
 import com.meli.orderbook.entity.order.model.Order.Type.SELL
 import com.meli.orderbook.entity.order.model.SellOrder
-import com.meli.orderbook.entity.transaction.gateway.TransactionHistoricCommandGateway
-import com.meli.orderbook.entity.transaction.model.Transaction
+import com.meli.orderbook.entity.trade.gateway.TradeHistoricCommandGateway
+import com.meli.orderbook.entity.trade.model.Trade
 import com.meli.orderbook.entity.wallet.gateway.WalletCommandGateway
 import com.meli.orderbook.entity.wallet.gateway.WalletQueryGateway
 import com.meli.orderbook.entity.wallet.model.Wallet
@@ -18,7 +18,7 @@ class TradeService(
     private val walletQueryGateway: WalletQueryGateway,
     private val walletCommandGateway: WalletCommandGateway,
     private val orderCommandGateway: OrderCommandGateway,
-    private val trasactionHistoricCommandGateway: TransactionHistoricCommandGateway
+    private val trasactionHistoricCommandGateway: TradeHistoricCommandGateway
 ) {
 
     fun executeSell(sellOrder: SellOrder, buyOrder: BuyOrder) {
@@ -31,11 +31,14 @@ class TradeService(
 
     @Transactional
     private fun execute(sellOrder: SellOrder, buyOrder: BuyOrder, transactionType: Order.Type) {
+
+        if (sellOrder.price > buyOrder.price) return
+
         val sellerWallet = walletQueryGateway.findById(sellOrder.walletId)
         val buyerWallet = walletQueryGateway.findById(buyOrder.walletId)
 
-        val transactionedMoney = depositMoneyToSeller(sellerWallet, sellOrder, buyOrder)
-        val transactionedAssets = depositAssetToBuyer(buyerWallet, sellOrder, buyOrder)
+        val transactionedMoney = exchangeMoney(sellerWallet, buyerWallet, sellOrder, buyOrder)
+        val transactionedAssets = exchangeAsssets(buyerWallet, sellOrder, buyOrder)
 
         orderCommandGateway.update(sellOrder)
         orderCommandGateway.update(buyOrder)
@@ -44,7 +47,7 @@ class TradeService(
         walletCommandGateway.update(buyerWallet)
 
         trasactionHistoricCommandGateway.register(
-            Transaction(
+            Trade(
                 sellerWallet.id,
                 buyerWallet.id,
                 transactionType,
@@ -54,43 +57,100 @@ class TradeService(
         )
     }
 
-    private fun depositMoneyToSeller(
+    private fun exchangeMoney(
         sellerWallet: Wallet,
+        buyerWallet: Wallet,
         sellOrder: SellOrder,
         buyOrder: BuyOrder
     ): BigDecimal {
-        return if (thereIsMoreToSellThanToBuy(sellOrder, buyOrder)) {
-            val amountOfBuyingAssets = buyOrder.getAllSizesAndCloseOrder().toBigDecimal()
-            sellerWallet.depositMoney(buyOrder.price.multiply(amountOfBuyingAssets))
+        return if (thereHasMoreToSellThanToBuy(sellOrder, buyOrder)) {
 
-            amountOfBuyingAssets
+            val amountOfBuyingAssets = buyOrder.size
+
+            exchangeMoneyWithChange(
+                amountOfBuyingAssets,
+                sellerWallet,
+                buyerWallet,
+                sellOrder,
+                buyOrder
+            )
+        } else if (thereHasLessToSellThanToBuy(sellOrder, buyOrder)) {
+
+            val amountOfSellingAssets = sellOrder.size
+
+            exchangeMoneyWithChange(
+                amountOfSellingAssets,
+                sellerWallet,
+                buyerWallet,
+                sellOrder,
+                buyOrder
+            )
         } else {
-            val amountOfSellingAssets = sellOrder.getAllSizesAndCloseOrder().toBigDecimal()
-            sellerWallet.depositMoney(buyOrder.price.multiply(amountOfSellingAssets))
+            val amountOfAssets = sellOrder.size.toBigDecimal()
+            val totalInTransaction = sellOrder.price.multiply(amountOfAssets)
 
-            amountOfSellingAssets
+            sellerWallet.depositMoney(totalInTransaction)
+
+            totalInTransaction
         }
     }
 
-    private fun depositAssetToBuyer(
+    private fun exchangeAsssets(
         buyerWallet: Wallet,
         sellOrder: SellOrder,
         buyOrder: BuyOrder
     ): Int {
-        return if (thereIsMoreToSellThanToBuy(sellOrder, buyOrder)) {
-            val amountOfBuyingAssets = buyOrder.getAllSizesAndCloseOrder()
+        return if (thereHasMoreToSellThanToBuy(sellOrder, buyOrder)) {
+
+            val amountOfBuyingAssets = buyOrder.subtractAllSize()
+            sellOrder.subractSizes(amountOfBuyingAssets)
+
             buyerWallet.depositAssets(amountOfBuyingAssets)
 
             amountOfBuyingAssets
-        } else {
-            val amountOfSellingAssets = sellOrder.getAllSizesAndCloseOrder()
+        } else if (thereHasLessToSellThanToBuy(sellOrder, buyOrder)) {
+
+            val amountOfSellingAssets = sellOrder.subtractAllSize()
+            buyOrder.subractSizes(amountOfSellingAssets)
+
             buyerWallet.depositAssets(amountOfSellingAssets)
 
             amountOfSellingAssets
+        } else {
+
+            val assets = sellOrder.subtractAllSize()
+            buyOrder.subtractAllSize()
+
+            buyerWallet.depositAssets(assets)
+
+            assets
         }
     }
 
-    private fun thereIsMoreToSellThanToBuy(sellOrder: SellOrder, buyOrder: BuyOrder): Boolean {
-        return sellOrder.size - buyOrder.size > 0
+    private fun exchangeMoneyWithChange(
+        amountOfBuyingAssets: Int,
+        sellerWallet: Wallet,
+        buyerWallet: Wallet,
+        sellOrder: SellOrder,
+        buyOrder: BuyOrder
+    ): BigDecimal {
+        val totalInTransaction = sellOrder.price.multiply(amountOfBuyingAssets.toBigDecimal())
+
+        sellerWallet.depositMoney(totalInTransaction)
+
+        if (buyOrder.price > sellOrder.price) {
+            val change = buyOrder.price - sellOrder.price
+            buyerWallet.depositMoney(change.multiply(amountOfBuyingAssets.toBigDecimal()))
+        }
+
+        return totalInTransaction
+    }
+
+    private fun thereHasMoreToSellThanToBuy(sellOrder: SellOrder, buyOrder: BuyOrder): Boolean {
+        return (sellOrder.size - buyOrder.size) > 0
+    }
+
+    private fun thereHasLessToSellThanToBuy(sellOrder: SellOrder, buyOrder: BuyOrder): Boolean {
+        return (sellOrder.size - buyOrder.size) < 0
     }
 }

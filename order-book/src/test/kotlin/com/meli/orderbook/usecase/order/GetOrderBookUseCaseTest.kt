@@ -46,7 +46,7 @@ class GetOrderBookUseCaseTest {
         assertEquals(SELL, output.orderBook.asks[0].type)
         assertEquals(BigDecimal("200"), output.orderBook.asks[0].price)
         assertEquals(dateTime, output.orderBook.asks[0].creationDate)
-        assertEquals(IN_TRADE, output.orderBook.asks[0].getState())
+        assertEquals(IN_TRADE, output.orderBook.asks[0].state)
         assertEquals(1, output.orderBook.asks[0].walletId)
         assertEquals(5, output.orderBook.asks[0].size)
 
@@ -54,7 +54,7 @@ class GetOrderBookUseCaseTest {
         assertEquals(BUY, output.orderBook.bids[0].type)
         assertEquals(BigDecimal("110"), output.orderBook.bids[0].price)
         assertEquals(dateTime, output.orderBook.bids[0].creationDate)
-        assertEquals(IN_TRADE, output.orderBook.bids[0].getState())
+        assertEquals(IN_TRADE, output.orderBook.bids[0].state)
         assertEquals(2, output.orderBook.bids[0].walletId)
         assertEquals(4, output.orderBook.bids[0].size)
 
@@ -64,10 +64,10 @@ class GetOrderBookUseCaseTest {
     private fun createOrderBook(): OrderBook {
         return OrderBook(
             listOf(
-                SellOrder(BigDecimal("200"), 5, 1, dateTime, 1)
+                SellOrder(BigDecimal("200"), 5, 1, dateTime, 1, IN_TRADE)
             ),
             listOf(
-                BuyOrder(BigDecimal("110"), 4, 2L, dateTime, 1)
+                BuyOrder(BigDecimal("110"), 4, 2L, dateTime, 1, IN_TRADE)
             )
         )
     }

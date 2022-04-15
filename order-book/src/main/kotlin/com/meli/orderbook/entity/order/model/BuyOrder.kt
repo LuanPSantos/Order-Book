@@ -10,7 +10,8 @@ class BuyOrder(
     size: Int,
     walletId: Long,
     creationDate: LocalDateTime = now(),
-    id: Long? = null
-) : Order(Type.BUY, price, size, creationDate, walletId, id = id) {
+    id: Long? = null,
+    state: State = State.CREATED
+) : Order(Type.BUY, price, size, creationDate, walletId, state, id) {
 
 }

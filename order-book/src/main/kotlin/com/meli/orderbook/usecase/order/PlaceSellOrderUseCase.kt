@@ -17,21 +17,28 @@ class PlaceSellOrderUseCase(
     fun execute(input: Input) {
 
         val orderBook = orderBookQueryGateway.get()
-        val sellOrder = SellOrder(input.price, input.size, input.walletId)
 
-        createSellOrderService.create(sellOrder)
+        val sellOrder = createSellOrderService.create(SellOrder(input.price, input.size, input.walletId))
 
-        val matchedBuyOrders = orderBook.findMatchingBuyOrders(sellOrder)
+        val matchedBuyOrders = orderBook.findMatchingBuyOrders(sellOrder).iterator()
+        sellOrder.enableToTrade()
 
-        if (matchedBuyOrders.isNotEmpty()) {
-            for (buyOrder in matchedBuyOrders) {
-                if (sellOrder.canTradeWith(buyOrder)) {
-                    tradeService.executeSell(sellOrder, buyOrder)
-                }
+        while (matchedBuyOrders.hasNext()) {
+            val buyOrder = matchedBuyOrders.next()
+            if (sellOrder.canTradeWith(buyOrder)) {
+                tradeService.executeSell(sellOrder, buyOrder)
             }
-
-            orderCommandGateway.update(sellOrder)
         }
+
+//        if (matchedBuyOrders.isNotEmpty()) {
+//            for (buyOrder in matchedBuyOrders) {
+//                if (sellOrder.canTradeWith(buyOrder)) {
+//                    tradeService.executeSell(sellOrder, buyOrder)
+//                }
+//            }
+//        }
+
+        orderCommandGateway.update(sellOrder)
     }
 
     data class Input(

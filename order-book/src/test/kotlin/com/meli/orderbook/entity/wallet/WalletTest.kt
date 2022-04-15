@@ -19,9 +19,9 @@ class WalletTest {
 
         assertEquals("Invalid size to subtract", exception.message)
 
-        assertEquals(5, wallet.getTheAmountOfAssets())
+        assertEquals(5, wallet.amountOfAssets)
         assertEquals(1, wallet.id)
-        assertEquals(BigDecimal.TEN, wallet.getTheAmountOfMoney())
+        assertEquals(BigDecimal.TEN, wallet.amountOfMoney)
     }
 
     @Test
@@ -34,9 +34,35 @@ class WalletTest {
 
         assertEquals("Invalid size to subtract", exception.message)
 
-        assertEquals(5, wallet.getTheAmountOfAssets())
+        assertEquals(5, wallet.amountOfAssets)
         assertEquals(1, wallet.id)
-        assertEquals(BigDecimal.TEN, wallet.getTheAmountOfMoney())
+        assertEquals(BigDecimal.TEN, wallet.amountOfMoney)
+    }
+
+    @Test
+    fun `Should not deposit when size is lass than zero`() {
+        val wallet = Wallet(1, BigDecimal.TEN, 5)
+
+        val exception = assertThrows<IllegalArgumentException> {
+            wallet.depositAssets(-1)
+        }
+
+        assertEquals("Invalid size to deposit", exception.message)
+
+        assertEquals(5, wallet.amountOfAssets)
+        assertEquals(1, wallet.id)
+        assertEquals(BigDecimal.TEN, wallet.amountOfMoney)
+    }
+
+    @Test
+    fun `Should  deposit when size to wallet`() {
+        val wallet = Wallet(1, BigDecimal.TEN, 5)
+
+        wallet.depositAssets(5)
+
+        assertEquals(10, wallet.amountOfAssets)
+        assertEquals(1, wallet.id)
+        assertEquals(BigDecimal.TEN, wallet.amountOfMoney)
     }
 
     @Test
@@ -45,9 +71,9 @@ class WalletTest {
 
         wallet.subtractAssets(3)
 
-        assertEquals(2, wallet.getTheAmountOfAssets())
+        assertEquals(2, wallet.amountOfAssets)
         assertEquals(1, wallet.id)
-        assertEquals(BigDecimal.TEN, wallet.getTheAmountOfMoney())
+        assertEquals(BigDecimal.TEN, wallet.amountOfMoney)
     }
 
     @Test
@@ -56,9 +82,9 @@ class WalletTest {
 
         wallet.depositMoney(BigDecimal.TEN)
 
-        assertEquals(BigDecimal("20"), wallet.getTheAmountOfMoney())
+        assertEquals(BigDecimal("20"), wallet.amountOfMoney)
         assertEquals(1, wallet.id)
-        assertEquals(5, wallet.getTheAmountOfAssets())
+        assertEquals(5, wallet.amountOfAssets)
     }
 
     @Test
@@ -71,8 +97,8 @@ class WalletTest {
 
         assertEquals("Invalid deposit value", exception.message)
 
-        assertEquals(BigDecimal("10"), wallet.getTheAmountOfMoney())
+        assertEquals(BigDecimal("10"), wallet.amountOfMoney)
         assertEquals(1, wallet.id)
-        assertEquals(5, wallet.getTheAmountOfAssets())
+        assertEquals(5, wallet.amountOfAssets)
     }
 }

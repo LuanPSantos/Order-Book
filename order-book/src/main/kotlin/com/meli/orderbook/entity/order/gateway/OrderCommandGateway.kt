@@ -4,6 +4,6 @@ import com.meli.orderbook.entity.order.model.Order
 
 interface OrderCommandGateway {
 
-    fun create(order: Order)
+    fun create(order: Order): Order
     fun update(order: Order)
 }
