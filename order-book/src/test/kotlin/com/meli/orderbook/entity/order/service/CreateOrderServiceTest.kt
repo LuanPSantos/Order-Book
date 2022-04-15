@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test
 import java.math.BigDecimal
 import java.time.LocalDateTime
 
-class CreateSellOrderServiceTest {
+class CreateOrderServiceTest {
 
     private val dateTime = LocalDateTime.now()
 
@@ -30,7 +30,7 @@ class CreateSellOrderServiceTest {
     lateinit var orderCommandGateway: OrderCommandGateway
 
     @InjectMockKs
-    lateinit var createSellOrderService: CreateSellOrderService
+    lateinit var createOrderService: CreateOrderService
 
     @BeforeEach
     fun setUp() = MockKAnnotations.init(this)
@@ -48,7 +48,7 @@ class CreateSellOrderServiceTest {
             orderCommandGateway.create(capture(sellOrderSlot))
         } returns SellOrder(BigDecimal("14"), 10, 1, dateTime, 1)
 
-        val sellOrder = createSellOrderService.create(SellOrder(BigDecimal("14"), 10, 1, dateTime))
+        val sellOrder = createOrderService.create(SellOrder(BigDecimal("14"), 10, 1, dateTime))
 
         assertEquals(1, walletSlot.captured.id)
         assertEquals(BigDecimal("100"), walletSlot.captured.amountOfMoney)

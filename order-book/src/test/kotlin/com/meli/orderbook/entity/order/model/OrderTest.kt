@@ -115,6 +115,7 @@ class OrderTest {
         buyOrder.close().subtractAllSize()
 
         assertFalse(sellOrder.canTradeWith(buyOrder))
+        assertEquals(0, buyOrder.size)
     }
 
     @Test
@@ -125,6 +126,7 @@ class OrderTest {
         buyOrder.cancel().subtractAllSize()
 
         assertFalse(sellOrder.canTradeWith(buyOrder))
+        assertEquals(0, buyOrder.size)
     }
 
     @Test
@@ -133,5 +135,47 @@ class OrderTest {
         val buyOrder = BuyOrder(BigDecimal.TEN, 5, 2, dateTime,  2, IN_TRADE)
 
         assertTrue(sellOrder.canTradeWith(buyOrder))
+    }
+
+    @Test
+    fun `Should make order able to trade`() {
+        val sellOrder = SellOrder(BigDecimal.TEN, 10, 1, dateTime,  1, CREATING)
+
+        sellOrder.enableToTrade()
+
+        assertEquals(IN_TRADE, sellOrder.state)
+    }
+
+    @Test
+    fun `Should not subtract negative size value`() {
+        val sellOrder = SellOrder(BigDecimal.TEN, 10, 1, dateTime,  1, IN_TRADE)
+
+        val exception = assertThrows<java.lang.IllegalArgumentException> {
+            sellOrder.subractSizes(-1)
+        }
+
+        assertEquals("Subtract negative value not allowed", exception.message)
+        assertEquals(IN_TRADE, sellOrder.state)
+        assertEquals(10, sellOrder.size)
+    }
+
+    @Test
+    fun `Should subtract size value`() {
+        val sellOrder = SellOrder(BigDecimal.TEN, 10, 1, dateTime,  1, IN_TRADE)
+
+        sellOrder.subractSizes(5)
+
+        assertEquals(IN_TRADE, sellOrder.state)
+        assertEquals(5, sellOrder.size)
+    }
+
+    @Test
+    fun `Should subtract all size value and close order`() {
+        val sellOrder = SellOrder(BigDecimal.TEN, 10, 1, dateTime,  1, IN_TRADE)
+
+        sellOrder.subractSizes(10)
+
+        assertEquals(CLOSED, sellOrder.state)
+        assertEquals(0, sellOrder.size)
     }
 }

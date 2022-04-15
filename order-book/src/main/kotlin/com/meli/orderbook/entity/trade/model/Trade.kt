@@ -11,6 +11,7 @@ data class Trade(
     val type: Order.Type,
     val size: Int,
     val price: BigDecimal,
+    val change: BigDecimal,
     val creationDate: LocalDateTime = now(),
     val id: Long? = null
 )

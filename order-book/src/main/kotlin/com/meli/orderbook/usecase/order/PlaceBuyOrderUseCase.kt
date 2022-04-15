@@ -1,13 +1,13 @@
 package com.meli.orderbook.usecase.order
 
-import com.meli.orderbook.entity.order.gateway.OrderCommandGateway
 import com.meli.orderbook.entity.order.gateway.OrderBookQueryGateway
-import com.meli.orderbook.entity.order.model.SellOrder
+import com.meli.orderbook.entity.order.gateway.OrderCommandGateway
+import com.meli.orderbook.entity.order.model.BuyOrder
 import com.meli.orderbook.entity.order.service.CreateOrderService
 import com.meli.orderbook.entity.trade.service.TradeService
 import java.math.BigDecimal
 
-class PlaceSellOrderUseCase(
+class PlaceBuyOrderUseCase (
     private val orderBookQueryGateway: OrderBookQueryGateway,
     private val orderCommandGateway: OrderCommandGateway,
     private val createOrderService: CreateOrderService,
@@ -17,15 +17,15 @@ class PlaceSellOrderUseCase(
     fun execute(input: Input) {
 
         val orderBook = orderBookQueryGateway.get()
-        val sellOrder = createOrderService.create(SellOrder(input.price, input.size, input.walletId))
+        val buyOrder = createOrderService.create(BuyOrder(input.price, input.size, input.walletId))
 
-        sellOrder.enableToTrade()
+        buyOrder.enableToTrade()
 
-        val matchedBuyOrders = orderBook.findMatchingBuyOrders(sellOrder)
+        val matchingSellOrders = orderBook.findMatchingSellOrders(buyOrder)
 
-        tradeService.executeSell(sellOrder, matchedBuyOrders)
+        tradeService.executeBuy(buyOrder, matchingSellOrders)
 
-        orderCommandGateway.update(sellOrder)
+        orderCommandGateway.update(buyOrder)
     }
 
     data class Input(

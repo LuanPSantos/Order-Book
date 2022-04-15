@@ -6,33 +6,41 @@ import com.meli.orderbook.entity.order.model.Order
 import com.meli.orderbook.entity.order.model.Order.Type.BUY
 import com.meli.orderbook.entity.order.model.Order.Type.SELL
 import com.meli.orderbook.entity.order.model.SellOrder
-import com.meli.orderbook.entity.trade.gateway.TradeHistoricCommandGateway
+import com.meli.orderbook.entity.trade.gateway.TradeHistoryCommandGateway
 import com.meli.orderbook.entity.trade.model.Trade
 import com.meli.orderbook.entity.wallet.gateway.WalletCommandGateway
 import com.meli.orderbook.entity.wallet.gateway.WalletQueryGateway
 import com.meli.orderbook.entity.wallet.model.Wallet
 import java.math.BigDecimal
-import javax.transaction.Transactional
 
 class TradeService(
     private val walletQueryGateway: WalletQueryGateway,
     private val walletCommandGateway: WalletCommandGateway,
     private val orderCommandGateway: OrderCommandGateway,
-    private val trasactionHistoricCommandGateway: TradeHistoricCommandGateway
+    private val tradeHistoryCommandGateway: TradeHistoryCommandGateway
 ) {
 
-    fun executeSell(sellOrder: SellOrder, buyOrder: BuyOrder) {
-        execute(sellOrder, buyOrder, SELL)
+    fun executeSell(sellOrder: SellOrder, matchingBuyOrders: List<BuyOrder>) {
+        val buyOrders = matchingBuyOrders.iterator()
+        while (buyOrders.hasNext()) {
+            val buyOrder = buyOrders.next()
+            if (sellOrder.canTradeWith(buyOrder)) {
+                execute(sellOrder, buyOrder, SELL)
+            }
+        }
     }
 
-    fun executeBuy(buyOrder: BuyOrder, sellOrder: SellOrder) {
-        execute(sellOrder, buyOrder, BUY)
+    fun executeBuy(buyOrder: BuyOrder, matchingSellOrders: List<SellOrder>) {
+        val sellOrders = matchingSellOrders.iterator()
+        while (sellOrders.hasNext()) {
+            val sellOrder = sellOrders.next()
+            if (sellOrder.canTradeWith(buyOrder)) {
+                execute(sellOrder, buyOrder, BUY)
+            }
+        }
     }
 
-    @Transactional
     private fun execute(sellOrder: SellOrder, buyOrder: BuyOrder, transactionType: Order.Type) {
-
-        if (sellOrder.price > buyOrder.price) throw IllegalArgumentException("Sell price greater than Buy price")
 
         val sellerWallet = walletQueryGateway.findById(sellOrder.walletId)
         val buyerWallet = walletQueryGateway.findById(buyOrder.walletId)
@@ -46,13 +54,14 @@ class TradeService(
         walletCommandGateway.update(sellerWallet)
         walletCommandGateway.update(buyerWallet)
 
-        trasactionHistoricCommandGateway.register(
+        tradeHistoryCommandGateway.register(
             Trade(
                 sellOrder.id!!,
                 buyOrder.id!!,
                 transactionType,
                 transactionedAssets,
-                transactionedMoney
+                transactionedMoney.totalExchanged,
+                transactionedMoney.change
             )
         )
     }
@@ -62,7 +71,7 @@ class TradeService(
         buyerWallet: Wallet,
         sellOrder: SellOrder,
         buyOrder: BuyOrder
-    ): BigDecimal {
+    ): ExchangeMoneyResult {
 
         return if (thereHasMoreToSellThanToBuy(sellOrder, buyOrder)) {
 
@@ -123,17 +132,24 @@ class TradeService(
         buyerWallet: Wallet,
         sellOrder: SellOrder,
         buyOrder: BuyOrder
-    ): BigDecimal {
+    ): ExchangeMoneyResult {
+        val result = ExchangeMoneyResult()
+
         val totalInTransaction = sellOrder.price.multiply(amountOfBuyingAssets.toBigDecimal())
+
+        result.totalExchanged = totalInTransaction
 
         sellerWallet.depositMoney(totalInTransaction)
 
         if (buyOrder.price > sellOrder.price) {
             val change = buyOrder.price - sellOrder.price
-            buyerWallet.depositMoney(change.multiply(amountOfBuyingAssets.toBigDecimal()))
+            val totalInChange = change.multiply(amountOfBuyingAssets.toBigDecimal())
+            result.change = totalInChange
+
+            buyerWallet.depositMoney(totalInChange)
         }
 
-        return totalInTransaction
+        return result
     }
 
     private fun thereHasMoreToSellThanToBuy(sellOrder: SellOrder, buyOrder: BuyOrder): Boolean {
@@ -143,4 +159,9 @@ class TradeService(
     private fun thereHasLessToSellThanToBuy(sellOrder: SellOrder, buyOrder: BuyOrder): Boolean {
         return (sellOrder.size - buyOrder.size) < 0
     }
+
+    data class ExchangeMoneyResult(
+        var totalExchanged: BigDecimal = BigDecimal.ZERO,
+        var change: BigDecimal = BigDecimal.ZERO
+    )
 }

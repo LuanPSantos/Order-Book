@@ -54,6 +54,10 @@ abstract class Order(
         }
 
         this.size -= sizes
+
+        if(this.size == 0) {
+            close()
+        }
     }
 
     enum class Type {
