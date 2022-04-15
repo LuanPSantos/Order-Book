@@ -11,7 +11,7 @@ class SellOrder(
     walletId: Long,
     creationDate: LocalDateTime = now(),
     id: Long? = null,
-    state: State = State.CREATED
+    state: State = State.CREATING
 ) : Order(Type.SELL, price, size, creationDate, walletId, state, id) {
 
     fun canTradeWith(buyOrder: BuyOrder): Boolean {

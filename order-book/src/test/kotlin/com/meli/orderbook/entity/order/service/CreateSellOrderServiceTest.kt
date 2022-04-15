@@ -1,7 +1,7 @@
 package com.meli.orderbook.entity.order.service
 
 import com.meli.orderbook.entity.order.gateway.OrderCommandGateway
-import com.meli.orderbook.entity.order.model.Order.State.CREATED
+import com.meli.orderbook.entity.order.model.Order.State.CREATING
 import com.meli.orderbook.entity.order.model.Order.Type.SELL
 import com.meli.orderbook.entity.order.model.SellOrder
 import com.meli.orderbook.entity.wallet.model.Wallet
@@ -58,7 +58,7 @@ class CreateSellOrderServiceTest {
         assertEquals(10, sellOrderSlot.captured.size)
         assertEquals(dateTime, sellOrderSlot.captured.creationDate)
         assertEquals(BigDecimal("14"), sellOrderSlot.captured.price)
-        assertEquals(CREATED, sellOrderSlot.captured.state)
+        assertEquals(CREATING, sellOrderSlot.captured.state)
         assertEquals(SELL, sellOrderSlot.captured.type)
         assertEquals(1, sellOrderSlot.captured.walletId)
 
@@ -66,7 +66,7 @@ class CreateSellOrderServiceTest {
         assertEquals(10, sellOrder.size)
         assertEquals(dateTime, sellOrder.creationDate)
         assertEquals(BigDecimal("14"), sellOrder.price)
-        assertEquals(CREATED, sellOrder.state)
+        assertEquals(CREATING, sellOrder.state)
         assertEquals(SELL, sellOrder.type)
         assertEquals(1, sellOrder.walletId)
 

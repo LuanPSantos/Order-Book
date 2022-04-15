@@ -30,14 +30,6 @@ class PlaceSellOrderUseCase(
             }
         }
 
-//        if (matchedBuyOrders.isNotEmpty()) {
-//            for (buyOrder in matchedBuyOrders) {
-//                if (sellOrder.canTradeWith(buyOrder)) {
-//                    tradeService.executeSell(sellOrder, buyOrder)
-//                }
-//            }
-//        }
-
         orderCommandGateway.update(sellOrder)
     }
 

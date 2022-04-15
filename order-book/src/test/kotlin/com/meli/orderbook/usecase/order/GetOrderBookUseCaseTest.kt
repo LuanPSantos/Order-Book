@@ -1,6 +1,5 @@
 package com.meli.orderbook.usecase.order
 
-import com.meli.orderbook.entity.order.model.Order
 import com.meli.orderbook.entity.order.model.Order.State.IN_TRADE
 import com.meli.orderbook.entity.order.model.Order.Type.BUY
 import com.meli.orderbook.entity.order.model.Order.Type.SELL

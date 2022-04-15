@@ -9,7 +9,7 @@ abstract class Order(
     size: Int,
     val creationDate: LocalDateTime,
     val walletId: Long,
-    state: State = State.CREATED,
+    state: State = State.CREATING,
     val id: Long? = null
 ) {
 
@@ -61,6 +61,6 @@ abstract class Order(
     }
 
     enum class State {
-        CREATED, IN_TRADE, CANCELLED, CLOSED
+        CREATING, IN_TRADE, CANCELLED, CLOSED
     }
 }

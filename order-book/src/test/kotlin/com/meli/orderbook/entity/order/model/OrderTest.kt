@@ -22,7 +22,7 @@ class OrderTest {
         assertEquals(dateTime, sellOrder.creationDate)
         assertEquals(1, sellOrder.id)
         assertEquals(SELL, sellOrder.type)
-        assertEquals(CREATED, sellOrder.state)
+        assertEquals(CREATING, sellOrder.state)
     }
 
     @Test
@@ -35,7 +35,7 @@ class OrderTest {
         assertEquals(dateTime, sellOrder.creationDate)
         assertEquals(1, sellOrder.id)
         assertEquals(BUY, sellOrder.type)
-        assertEquals(CREATED, sellOrder.state)
+        assertEquals(CREATING, sellOrder.state)
     }
 
     @Test
