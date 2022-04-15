@@ -5,8 +5,6 @@ import com.meli.orderbook.entity.order.model.BuyOrder
 import com.meli.orderbook.entity.order.model.Order
 import com.meli.orderbook.entity.order.model.Order.State.CLOSED
 import com.meli.orderbook.entity.order.model.Order.State.IN_TRADE
-import com.meli.orderbook.entity.order.model.Order.Type.BUY
-import com.meli.orderbook.entity.order.model.Order.Type.SELL
 import com.meli.orderbook.entity.order.model.SellOrder
 import com.meli.orderbook.entity.trade.gateway.TradeHistoricCommandGateway
 import com.meli.orderbook.entity.trade.model.Trade
@@ -16,8 +14,10 @@ import com.meli.orderbook.entity.wallet.model.Wallet
 import io.mockk.*
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
-import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.Arguments.arguments
@@ -48,6 +48,19 @@ class TradeServiceTest {
     @BeforeEach
     fun setUp() = MockKAnnotations.init(this)
 
+    @Test
+    fun `Should not excecute a sell trade if sell price is greater than the buy price`() {
+
+        val exception = assertThrows<java.lang.IllegalArgumentException> {
+            tradeService.executeSell(
+                SellOrder(BigDecimal("15"), 10, 1, dateTime, 1, IN_TRADE),
+                BuyOrder(BigDecimal("10"), 10, 2, dateTime, 2, IN_TRADE)
+            )
+        }
+
+        assertEquals("Sell price greater than Buy price", exception.message)
+    }
+
     @ParameterizedTest
     @MethodSource("testScenarios")
     fun `Should execute a sell trande`(
@@ -58,11 +71,11 @@ class TradeServiceTest {
         expectedSellerWallet: Wallet,
         expectedBuyerWallet: Wallet,
         expectedSellOrder: SellOrder,
-        expectedBuyOrder: BuyOrder
+        expectedBuyOrder: BuyOrder,
+        expectedTrade: Trade
     ) {
         val walletsSlot = mutableListOf<Wallet>()
         val ordersSlot = mutableListOf<Order>()
-
         val tradeSlot = slot<Trade>()
 
         every { walletQueryGateway.findById(eq(sellerWallet.id)) } returns sellerWallet
@@ -109,6 +122,14 @@ class TradeServiceTest {
         assertEquals(expectedBuyOrder.price, buyOrderCaptured?.price)
         assertEquals(expectedBuyOrder.type, buyOrderCaptured?.type)
         assertEquals(expectedBuyOrder.state, buyOrderCaptured?.state)
+
+        assertNull(tradeSlot.captured.id)
+        assertEquals(expectedTrade.size, tradeSlot.captured.size)
+        assertEquals(expectedTrade.price, tradeSlot.captured.price)
+        assertEquals(expectedTrade.sellOrderId, tradeSlot.captured.sellOrderId)
+        assertEquals(expectedTrade.buyerOrderId, tradeSlot.captured.buyerOrderId)
+        assertEquals(expectedTrade.type, tradeSlot.captured.type)
+        assertNotNull(tradeSlot.captured.creationDate)
     }
 
     private companion object {
@@ -135,7 +156,8 @@ class TradeServiceTest {
                 Wallet(1, BigDecimal("110"), 10),
                 Wallet(2, BigDecimal("10"), 20),
                 SellOrder(BigDecimal("10"), 0, 1, dateTime, 1, CLOSED),
-                BuyOrder(BigDecimal("10"), 0, 2, dateTime, 2, CLOSED)
+                BuyOrder(BigDecimal("10"), 0, 2, dateTime, 2, CLOSED),
+                Trade(1, 2, Order.Type.SELL, 10, BigDecimal("100"), dateTime)
             )
         }
 
@@ -148,7 +170,8 @@ class TradeServiceTest {
                 Wallet(1, BigDecimal("110"), 10),
                 Wallet(2, BigDecimal("10"), 20),
                 SellOrder(BigDecimal("10"), 5, 1, dateTime, 1, IN_TRADE),
-                BuyOrder(BigDecimal("10"), 0, 2, dateTime, 2, CLOSED)
+                BuyOrder(BigDecimal("10"), 0, 2, dateTime, 2, CLOSED),
+                Trade(1, 2, Order.Type.SELL, 10, BigDecimal("100"), dateTime)
             )
         }
 
@@ -161,7 +184,8 @@ class TradeServiceTest {
                 Wallet(1, BigDecimal("110"), 10),
                 Wallet(2, BigDecimal("10"), 20),
                 SellOrder(BigDecimal("10"), 0, 1, dateTime, 1, CLOSED),
-                BuyOrder(BigDecimal("10"), 5, 2, dateTime, 2, IN_TRADE)
+                BuyOrder(BigDecimal("10"), 5, 2, dateTime, 2, IN_TRADE),
+                Trade(1, 2, Order.Type.SELL, 10, BigDecimal("100"), dateTime)
             )
         }
 
@@ -174,7 +198,8 @@ class TradeServiceTest {
                 Wallet(1, BigDecimal("100"), 10),
                 Wallet(2, BigDecimal("20"), 20),
                 SellOrder(BigDecimal("9"), 0, 1, dateTime, 1, CLOSED),
-                BuyOrder(BigDecimal("10"), 0, 2, dateTime, 2, CLOSED)
+                BuyOrder(BigDecimal("10"), 0, 2, dateTime, 2, CLOSED),
+                Trade(1, 2, Order.Type.SELL, 10, BigDecimal("90"), dateTime)
             )
         }
 
@@ -187,7 +212,8 @@ class TradeServiceTest {
                 Wallet(1, BigDecimal("100"), 10),
                 Wallet(2, BigDecimal("20"), 20),
                 SellOrder(BigDecimal("9"), 5, 1, dateTime, 1, IN_TRADE),
-                BuyOrder(BigDecimal("10"), 0, 2, dateTime, 2, CLOSED)
+                BuyOrder(BigDecimal("10"), 0, 2, dateTime, 2, CLOSED),
+                Trade(1, 2, Order.Type.SELL, 10, BigDecimal("90"), dateTime)
             )
         }
 
@@ -200,7 +226,8 @@ class TradeServiceTest {
                 Wallet(1, BigDecimal("100"), 10),
                 Wallet(2, BigDecimal("20"), 20),
                 SellOrder(BigDecimal("9"), 0, 1, dateTime, 1, CLOSED),
-                BuyOrder(BigDecimal("10"), 5, 2, dateTime, 2, IN_TRADE)
+                BuyOrder(BigDecimal("10"), 5, 2, dateTime, 2, IN_TRADE),
+                Trade(1, 2, Order.Type.SELL, 10, BigDecimal("90"), dateTime)
             )
         }
     }

@@ -32,7 +32,7 @@ class TradeService(
     @Transactional
     private fun execute(sellOrder: SellOrder, buyOrder: BuyOrder, transactionType: Order.Type) {
 
-        if (sellOrder.price > buyOrder.price) return
+        if (sellOrder.price > buyOrder.price) throw IllegalArgumentException("Sell price greater than Buy price")
 
         val sellerWallet = walletQueryGateway.findById(sellOrder.walletId)
         val buyerWallet = walletQueryGateway.findById(buyOrder.walletId)
@@ -48,8 +48,8 @@ class TradeService(
 
         trasactionHistoricCommandGateway.register(
             Trade(
-                sellerWallet.id,
-                buyerWallet.id,
+                sellOrder.id!!,
+                buyOrder.id!!,
                 transactionType,
                 transactionedAssets,
                 transactionedMoney
@@ -63,6 +63,7 @@ class TradeService(
         sellOrder: SellOrder,
         buyOrder: BuyOrder
     ): BigDecimal {
+
         return if (thereHasMoreToSellThanToBuy(sellOrder, buyOrder)) {
 
             val amountOfBuyingAssets = buyOrder.size
@@ -88,11 +89,7 @@ class TradeService(
         }
     }
 
-    private fun exchangeAsssets(
-        buyerWallet: Wallet,
-        sellOrder: SellOrder,
-        buyOrder: BuyOrder
-    ): Int {
+    private fun exchangeAsssets(buyerWallet: Wallet, sellOrder: SellOrder, buyOrder: BuyOrder): Int {
         return if (thereHasMoreToSellThanToBuy(sellOrder, buyOrder)) {
 
             val amountOfBuyingAssets = buyOrder.subtractAllSize()
