@@ -52,7 +52,7 @@ class PlaceSellOrderUseCaseTest {
 
         every { orderBookQueryGateway.get() } returns createOrderBook()
         every {
-            createOrderService.create(capture(createSellOrderSlot))
+            createOrderService.createSellOrder(capture(createSellOrderSlot))
         } returns SellOrder(BigDecimal("210"), 10, 7, dateTime, 7)
         every { tradeService.executeSell(capture(sellOrderSlot), capture(buyOrderSlot)) } just Runs
         every { orderCommandGateway.update(capture(resolvedSellOrderSlot)) } just Runs
@@ -60,7 +60,7 @@ class PlaceSellOrderUseCaseTest {
         placeSellOrderUseCase.execute(PlaceSellOrderUseCase.Input(7, 10, BigDecimal("210")))
 
         verify(exactly = 1) { orderBookQueryGateway.get() }
-        verify(exactly = 1) { createOrderService.create(any()) }
+        verify(exactly = 1) { createOrderService.createBuyOrder(any()) }
         verify(exactly = 1) { tradeService.executeSell(any(), any()) }
         verify(exactly = 1) { orderCommandGateway.update(any()) }
 
@@ -113,7 +113,7 @@ class PlaceSellOrderUseCaseTest {
 
         every { orderBookQueryGateway.get() } returns createOrderBook()
         every {
-            createOrderService.create(capture(createSellOrderSlot))
+            createOrderService.createSellOrder(capture(createSellOrderSlot))
         } returns SellOrder(BigDecimal("410"), 10, 7, dateTime, 7)
         every { tradeService.executeSell(capture(sellOrderSlot), capture(buyOrderSlot)) } just Runs
         every { orderCommandGateway.update(capture(resolvedSellOrderSlot)) } just Runs
@@ -121,7 +121,7 @@ class PlaceSellOrderUseCaseTest {
         placeSellOrderUseCase.execute(PlaceSellOrderUseCase.Input(7, 10, BigDecimal("410")))
 
         verify(exactly = 1) { orderBookQueryGateway.get() }
-        verify(exactly = 1) { createOrderService.create(any()) }
+        verify(exactly = 1) { createOrderService.createBuyOrder(any()) }
         verify(exactly = 1) { tradeService.executeSell(any(), any()) }
         verify(exactly = 1) { orderCommandGateway.update(any()) }
 

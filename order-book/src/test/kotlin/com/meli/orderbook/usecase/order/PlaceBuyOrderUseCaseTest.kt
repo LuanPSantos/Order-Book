@@ -54,7 +54,7 @@ class PlaceBuyOrderUseCaseTest {
 
         every { orderBookQueryGateway.get() } returns createOrderBook()
         every {
-            createOrderService.create(capture(createBuyOrderSlot))
+            createOrderService.createBuyOrder(capture(createBuyOrderSlot))
         } returns BuyOrder(BigDecimal("250"), 10, 7, dateTime, 7)
         every { tradeService.executeBuy(capture(buyOrderSlot), capture(sellOrderSlot)) } just Runs
         every { orderCommandGateway.update(capture(resolvedBuyOrderSlot)) } just Runs
@@ -62,7 +62,7 @@ class PlaceBuyOrderUseCaseTest {
         placeBuyOrderUseCase.execute(Input(7, 10, BigDecimal("250")))
 
         verify(exactly = 1) { orderBookQueryGateway.get() }
-        verify(exactly = 1) { createOrderService.create(any()) }
+        verify(exactly = 1) { createOrderService.createBuyOrder(any()) }
         verify(exactly = 1) { tradeService.executeBuy(any(), any()) }
         verify(exactly = 1) { orderCommandGateway.update(any()) }
 
@@ -107,7 +107,7 @@ class PlaceBuyOrderUseCaseTest {
 
         every { orderBookQueryGateway.get() } returns createOrderBook()
         every {
-            createOrderService.create(capture(createBuyOrderSlot))
+            createOrderService.createBuyOrder(capture(createBuyOrderSlot))
         } returns BuyOrder(BigDecimal("200"), 10, 7, dateTime, 7)
         every { tradeService.executeBuy(capture(buyOrderSlot), capture(sellOrderSlot)) } just Runs
         every { orderCommandGateway.update(capture(resolvedBuyOrderSlot)) } just Runs
@@ -115,7 +115,7 @@ class PlaceBuyOrderUseCaseTest {
         placeBuyOrderUseCase.execute(Input(7, 10, BigDecimal("200")))
 
         verify(exactly = 1) { orderBookQueryGateway.get() }
-        verify(exactly = 1) { createOrderService.create(any()) }
+        verify(exactly = 1) { createOrderService.createBuyOrder(any()) }
         verify(exactly = 1) { tradeService.executeBuy(any(), any()) }
         verify(exactly = 1) { orderCommandGateway.update(any()) }
 

@@ -2,7 +2,9 @@ package com.meli.orderbook.usecase.wallet
 
 import com.meli.orderbook.entity.wallet.gateway.WalletQueryGateway
 import com.meli.orderbook.entity.wallet.model.Wallet
+import org.springframework.stereotype.Service
 
+@Service
 class GetWalletUseCase(
     private val walletQueryGateway: WalletQueryGateway
 ) {

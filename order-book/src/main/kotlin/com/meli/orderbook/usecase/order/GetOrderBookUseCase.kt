@@ -2,7 +2,9 @@ package com.meli.orderbook.usecase.order
 
 import com.meli.orderbook.entity.order.model.OrderBook
 import com.meli.orderbook.entity.order.gateway.OrderBookQueryGateway
+import org.springframework.stereotype.Service
 
+@Service
 class GetOrderBookUseCase(
     private val orderBookQueryGateway: OrderBookQueryGateway
 ) {

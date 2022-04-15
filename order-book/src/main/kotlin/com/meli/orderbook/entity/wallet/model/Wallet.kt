@@ -35,4 +35,17 @@ class Wallet(
         }
         this.amountOfMoney += deposit
     }
+
+    fun subtractMoney(subtract: BigDecimal) {
+        if (subtract < BigDecimal.ZERO || subtract > this.amountOfMoney) {
+            throw IllegalArgumentException("Invalid subtract value")
+        }
+
+
+        this.amountOfMoney -= subtract
+    }
+
+    override fun toString(): String {
+        return "Wallet(id=$id, amountOfMoney=$amountOfMoney, amountOfAssets=$amountOfAssets)"
+    }
 }

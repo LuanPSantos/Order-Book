@@ -11,8 +11,11 @@ import com.meli.orderbook.entity.trade.model.Trade
 import com.meli.orderbook.entity.wallet.gateway.WalletCommandGateway
 import com.meli.orderbook.entity.wallet.gateway.WalletQueryGateway
 import com.meli.orderbook.entity.wallet.model.Wallet
+import org.slf4j.LoggerFactory
+import org.springframework.stereotype.Service
 import java.math.BigDecimal
 
+@Service
 class TradeService(
     private val walletQueryGateway: WalletQueryGateway,
     private val walletCommandGateway: WalletCommandGateway,
@@ -20,10 +23,14 @@ class TradeService(
     private val tradeHistoryCommandGateway: TradeHistoryCommandGateway
 ) {
 
+    private val log = LoggerFactory.getLogger(this::class.java)
+
     fun executeSell(sellOrder: SellOrder, matchingBuyOrders: List<BuyOrder>) {
+        log.info("m=executeSell, sellOrder=$sellOrder, matchingBuyOrders=${matchingBuyOrders.size}")
         val buyOrders = matchingBuyOrders.iterator()
         while (buyOrders.hasNext()) {
             val buyOrder = buyOrders.next()
+            log.info("m=executeSell, buyOrder=$buyOrder")
             if (sellOrder.canTradeWith(buyOrder)) {
                 execute(sellOrder, buyOrder, SELL)
             }
@@ -31,9 +38,11 @@ class TradeService(
     }
 
     fun executeBuy(buyOrder: BuyOrder, matchingSellOrders: List<SellOrder>) {
+        log.info("m=executeBuy, buyOrder=$buyOrder, matchingSellOrders=${matchingSellOrders.size}")
         val sellOrders = matchingSellOrders.iterator()
         while (sellOrders.hasNext()) {
             val sellOrder = sellOrders.next()
+            log.info("m=executeBuy, sellOrder=$sellOrder")
             if (sellOrder.canTradeWith(buyOrder)) {
                 execute(sellOrder, buyOrder, BUY)
             }
@@ -41,9 +50,12 @@ class TradeService(
     }
 
     private fun execute(sellOrder: SellOrder, buyOrder: BuyOrder, transactionType: Order.Type) {
+        log.info("m=execute, transactionType=$transactionType")
 
         val sellerWallet = walletQueryGateway.findById(sellOrder.walletId)
         val buyerWallet = walletQueryGateway.findById(buyOrder.walletId)
+
+        log.info("m=execute, sellerWallet=${sellerWallet}, buyerWallet=${buyerWallet}")
 
         val transactionedMoney = exchangeMoney(sellerWallet, buyerWallet, sellOrder, buyOrder)
         val transactionedAssets = exchangeAsssets(buyerWallet, sellOrder, buyOrder)
@@ -51,8 +63,12 @@ class TradeService(
         orderCommandGateway.update(sellOrder)
         orderCommandGateway.update(buyOrder)
 
+        log.info("m=execute, sellOrder=$sellOrder, buyOrder=$buyOrder")
+
         walletCommandGateway.update(sellerWallet)
         walletCommandGateway.update(buyerWallet)
+
+        log.info("m=execute, sellerWallet=$sellerWallet, buyerWallet=$buyerWallet")
 
         tradeHistoryCommandGateway.register(
             Trade(
@@ -74,6 +90,7 @@ class TradeService(
     ): ExchangeMoneyResult {
 
         return if (thereHasMoreToSellThanToBuy(sellOrder, buyOrder)) {
+            log.info("m=exchangeMoney, thereHasMoreToSellThanToBuy=true")
 
             val amountOfBuyingAssets = buyOrder.size
 
@@ -85,6 +102,7 @@ class TradeService(
                 buyOrder
             )
         } else {
+            log.info("m=exchangeMoney, thereHasMoreToSellThanToBuy=false")
 
             val amountOfSellingAssets = sellOrder.size
 
@@ -100,27 +118,36 @@ class TradeService(
 
     private fun exchangeAsssets(buyerWallet: Wallet, sellOrder: SellOrder, buyOrder: BuyOrder): Int {
         return if (thereHasMoreToSellThanToBuy(sellOrder, buyOrder)) {
+            log.info("m=exchangeMoneyWithChange, thereHasMoreToSellThanToBuy=true")
 
             val amountOfBuyingAssets = buyOrder.subtractAllSize()
             sellOrder.subractSizes(amountOfBuyingAssets)
 
             buyerWallet.depositAssets(amountOfBuyingAssets)
 
+            log.info("m=exchangeMoneyWithChange, amountOfBuyingAssets=$amountOfBuyingAssets")
+
             amountOfBuyingAssets
         } else if (thereHasLessToSellThanToBuy(sellOrder, buyOrder)) {
+            log.info("m=exchangeMoneyWithChange, thereHasMoreToSellThanToBuy=false")
 
             val amountOfSellingAssets = sellOrder.subtractAllSize()
             buyOrder.subractSizes(amountOfSellingAssets)
 
             buyerWallet.depositAssets(amountOfSellingAssets)
 
+            log.info("m=exchangeMoneyWithChange, amountOfSellingAssets=$amountOfSellingAssets")
+
             amountOfSellingAssets
         } else {
+            log.info("m=exchangeMoneyWithChange, thereHasMoreToSellThanToBuy=equal")
 
             val assets = sellOrder.subtractAllSize()
             buyOrder.subtractAllSize()
 
             buyerWallet.depositAssets(assets)
+
+            log.info("m=exchangeMoneyWithChange, assets=$assets")
 
             assets
         }
@@ -133,6 +160,7 @@ class TradeService(
         sellOrder: SellOrder,
         buyOrder: BuyOrder
     ): ExchangeMoneyResult {
+        log.info("m=exchangeMoneyWithChange, amountOfBuyingAssets=$amountOfBuyingAssets")
         val result = ExchangeMoneyResult()
 
         val totalInTransaction = sellOrder.price.multiply(amountOfBuyingAssets.toBigDecimal())
@@ -148,6 +176,8 @@ class TradeService(
 
             buyerWallet.depositMoney(totalInChange)
         }
+
+        log.info("m=exchangeMoneyWithChange, totalInTransaction=${result.totalExchanged}, totalInChange=${result.change}")
 
         return result
     }

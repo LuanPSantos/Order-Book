@@ -3,7 +3,7 @@ package com.meli.orderbook.entity.order.model
 import java.math.BigDecimal
 import java.time.LocalDateTime
 
-abstract class Order(
+open class Order(
     val type: Type,
     val price: BigDecimal,
     size: Int,
@@ -59,6 +59,11 @@ abstract class Order(
             close()
         }
     }
+
+    override fun toString(): String {
+        return "Order(type=$type, price=$price, creationDate=$creationDate, walletId=$walletId, id=$id, state=$state, size=$size)"
+    }
+
 
     enum class Type {
         SELL, BUY

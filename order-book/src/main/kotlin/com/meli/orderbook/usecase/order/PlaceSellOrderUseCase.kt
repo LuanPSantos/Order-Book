@@ -5,8 +5,10 @@ import com.meli.orderbook.entity.order.gateway.OrderBookQueryGateway
 import com.meli.orderbook.entity.order.model.SellOrder
 import com.meli.orderbook.entity.order.service.CreateOrderService
 import com.meli.orderbook.entity.trade.service.TradeService
+import org.springframework.stereotype.Service
 import java.math.BigDecimal
 
+@Service
 class PlaceSellOrderUseCase(
     private val orderBookQueryGateway: OrderBookQueryGateway,
     private val orderCommandGateway: OrderCommandGateway,
@@ -17,7 +19,7 @@ class PlaceSellOrderUseCase(
     fun execute(input: Input) {
 
         val orderBook = orderBookQueryGateway.get()
-        val sellOrder = createOrderService.create(SellOrder(input.price, input.size, input.walletId))
+        val sellOrder = createOrderService.createSellOrder(SellOrder(input.price, input.size, input.walletId))
 
         sellOrder.enableToTrade()
 

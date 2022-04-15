@@ -48,7 +48,7 @@ class CreateOrderServiceTest {
             orderCommandGateway.create(capture(sellOrderSlot))
         } returns SellOrder(BigDecimal("14"), 10, 1, dateTime, 1)
 
-        val sellOrder = createOrderService.create(SellOrder(BigDecimal("14"), 10, 1, dateTime))
+        val sellOrder = createOrderService.createSellOrder(SellOrder(BigDecimal("14"), 10, 1, dateTime))
 
         assertEquals(1, walletSlot.captured.id)
         assertEquals(BigDecimal("100"), walletSlot.captured.amountOfMoney)
