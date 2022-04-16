@@ -12,11 +12,12 @@ class TradeSchema(
     val id: Long? = null,
     val sellOrderId: Long? = null,
     val buyerOrderId: Long? = null,
+    val sellerWalletId: Long? = null,
+    val buyerWalletId: Long? = null,
     @field:Enumerated(EnumType.STRING)
     val type: Order.Type? = null,
     val size: Int? = null,
     val price: BigDecimal? = null,
     val change: BigDecimal? = null,
-    val creationDate: LocalDateTime? = null,
-
+    val creationDate: LocalDateTime? = null
 )

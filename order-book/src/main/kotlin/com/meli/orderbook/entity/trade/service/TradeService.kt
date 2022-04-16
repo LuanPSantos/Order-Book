@@ -66,6 +66,8 @@ class TradeService(
             Trade(
                 sellOrder.id!!,
                 buyOrder.id!!,
+                sellerWallet.id,
+                buyerWallet.id,
                 transactionType,
                 transactionedAssets,
                 transactionedMoney.totalExchanged,

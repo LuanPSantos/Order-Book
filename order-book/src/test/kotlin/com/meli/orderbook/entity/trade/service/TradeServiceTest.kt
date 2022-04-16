@@ -158,7 +158,7 @@ class TradeServiceTest {
                 Wallet(2, BigDecimal("10"), 20),
                 Order(1, SELL, BigDecimal("10"), 0, dateTime, CLOSED, 1),
                 Order(2, BUY, BigDecimal("10"), 0, dateTime, CLOSED, 2),
-                Trade(1, 2, SELL, 10, BigDecimal("10"), BigDecimal("0"), dateTime)
+                Trade(1, 2, 1, 2, SELL, 10, BigDecimal("10"), BigDecimal("0"), dateTime)
             )
         }
 
@@ -172,7 +172,7 @@ class TradeServiceTest {
                 Wallet(2, BigDecimal("10"), 20),
                 Order(1, SELL, BigDecimal("10"), 5, dateTime, IN_TRADE, 1),
                 Order(2, BUY, BigDecimal("10"), 0, dateTime, CLOSED, 2),
-                Trade(1, 2, SELL, 10, BigDecimal("10"), BigDecimal("0"), dateTime)
+                Trade(1, 2, 1, 2, SELL, 10, BigDecimal("10"), BigDecimal("0"), dateTime)
             )
         }
 
@@ -186,7 +186,7 @@ class TradeServiceTest {
                 Wallet(2, BigDecimal("10"), 20),
                 Order(1, SELL, BigDecimal("10"), 0, dateTime, CLOSED, 1),
                 Order(2, BUY, BigDecimal("10"), 5, dateTime, IN_TRADE, 2),
-                Trade(1, 2, SELL, 10, BigDecimal("10"), BigDecimal("0"), dateTime)
+                Trade(1, 2, 1, 2, SELL, 10, BigDecimal("10"), BigDecimal("0"), dateTime)
             )
         }
 
@@ -200,7 +200,7 @@ class TradeServiceTest {
                 Wallet(2, BigDecimal("20"), 20),
                 Order(1, SELL, BigDecimal("9"), 0, dateTime, CLOSED, 1),
                 Order(2, BUY, BigDecimal("10"), 0, dateTime, CLOSED, 2),
-                Trade(1, 2, SELL, 10, BigDecimal("9"), BigDecimal("1"), dateTime)
+                Trade(1, 2, 1, 2, SELL, 10, BigDecimal("9"), BigDecimal("1"), dateTime)
             )
         }
 
@@ -214,7 +214,7 @@ class TradeServiceTest {
                 Wallet(2, BigDecimal("20"), 20),
                 Order(1, SELL, BigDecimal("9"), 5, dateTime, IN_TRADE, 1),
                 Order(2, BUY, BigDecimal("10"), 0, dateTime, CLOSED, 2),
-                Trade(1, 2, SELL, 10, BigDecimal("9"), BigDecimal("1"), dateTime)
+                Trade(1, 2, 1, 2, SELL, 10, BigDecimal("9"), BigDecimal("1"), dateTime)
             )
         }
 
@@ -228,7 +228,7 @@ class TradeServiceTest {
                 Wallet(2, BigDecimal("20"), 20),
                 Order(1, SELL, BigDecimal("9"), 0, dateTime, CLOSED, 1),
                 Order(2, BUY, BigDecimal("10"), 5, dateTime, IN_TRADE, 2),
-                Trade(1, 2, SELL, 10, BigDecimal("9"), BigDecimal("1"), dateTime)
+                Trade(1, 2, 1, 1, SELL, 10, BigDecimal("9"), BigDecimal("1"), dateTime)
             )
         }
     }

@@ -21,6 +21,7 @@ class OrderDatabaseGateway(
         val asks = orderRepository
             .findByStateAndType(IN_TRADE, SELL)
             .map { Order(it.walletId!!, SELL, it.price!!, it.size!!, it.creationDate!!, it.state!!, it.id) }
+
         val bids = orderRepository.findByStateAndType(IN_TRADE, BUY)
             .map { Order(it.walletId!!, BUY, it.price!!, it.size!!, it.creationDate!!, it.state!!, it.id) }
 

@@ -1,6 +1,5 @@
 package com.meli.orderbook.usecase.trade
 
-import com.meli.orderbook.entity.order.model.Order
 import com.meli.orderbook.entity.order.model.Order.Type.SELL
 import com.meli.orderbook.entity.trade.gateway.TradeHistoryQueryGateway
 import com.meli.orderbook.entity.trade.model.Trade
@@ -8,7 +7,6 @@ import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
-import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -29,7 +27,7 @@ class GetTradeHistoryUseCaseTest {
     @Test
     fun `Should get the trade history`() {
         val dateTime = LocalDateTime.now()
-        val trade = Trade(1, 2, SELL, 10, BigDecimal("10"), BigDecimal("0"), dateTime, 1)
+        val trade = Trade(1, 2, 1, 2, SELL, 10, BigDecimal("10"), BigDecimal("0"), dateTime, 1)
 
         every { tradeHistoryQueryGateway.getHistory(eq(0), eq(1)) } returns listOf(trade)
 

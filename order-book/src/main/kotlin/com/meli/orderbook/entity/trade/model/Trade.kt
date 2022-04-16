@@ -8,6 +8,8 @@ import java.time.LocalDateTime.now
 data class Trade(
     val sellOrderId: Long,
     val buyerOrderId: Long,
+    val sellerWalletId: Long,
+    val buyerWalletId: Long,
     val type: Order.Type,
     val size: Int,
     val price: BigDecimal,
