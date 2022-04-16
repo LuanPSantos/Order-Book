@@ -1,11 +1,10 @@
 package com.meli.orderbook.entity.trade.service
 
 import com.meli.orderbook.entity.order.gateway.OrderCommandGateway
-import com.meli.orderbook.entity.order.model.BuyOrder
 import com.meli.orderbook.entity.order.model.Order
+import com.meli.orderbook.entity.order.model.Order.Type
 import com.meli.orderbook.entity.order.model.Order.Type.BUY
 import com.meli.orderbook.entity.order.model.Order.Type.SELL
-import com.meli.orderbook.entity.order.model.SellOrder
 import com.meli.orderbook.entity.trade.gateway.TradeHistoryCommandGateway
 import com.meli.orderbook.entity.trade.model.Trade
 import com.meli.orderbook.entity.wallet.gateway.WalletCommandGateway
@@ -25,31 +24,24 @@ class TradeService(
 
     private val log = LoggerFactory.getLogger(this::class.java)
 
-    fun executeSell(sellOrder: SellOrder, matchingBuyOrders: List<BuyOrder>) {
-        log.info("m=executeSell, sellOrder=$sellOrder, matchingBuyOrders=${matchingBuyOrders.size}")
-        val buyOrders = matchingBuyOrders.iterator()
-        while (buyOrders.hasNext()) {
-            val buyOrder = buyOrders.next()
-            log.info("m=executeSell, buyOrder=$buyOrder")
-            if (sellOrder.canTradeWith(buyOrder)) {
-                execute(sellOrder, buyOrder, SELL)
+    fun execute(createdOrder: Order, matchedOrders: List<Order>) {
+        log.info("m=execute, createdOrder=$createdOrder, matchedOrders=${matchedOrders.size}")
+
+        val matchedOrdersIterator = matchedOrders.iterator()
+        while (matchedOrdersIterator.hasNext()) {
+            val matchedOrder = matchedOrdersIterator.next()
+
+            log.info("m=execute, matchedOrder=$matchedOrder")
+            if (createdOrder.canTradeWith(matchedOrder)) {
+                when (createdOrder.type) {
+                    BUY -> execute(matchedOrder, createdOrder, createdOrder.type)
+                    SELL -> execute(createdOrder, matchedOrder, createdOrder.type)
+                }
             }
         }
     }
 
-    fun executeBuy(buyOrder: BuyOrder, matchingSellOrders: List<SellOrder>) {
-        log.info("m=executeBuy, buyOrder=$buyOrder, matchingSellOrders=${matchingSellOrders.size}")
-        val sellOrders = matchingSellOrders.iterator()
-        while (sellOrders.hasNext()) {
-            val sellOrder = sellOrders.next()
-            log.info("m=executeBuy, sellOrder=$sellOrder")
-            if (sellOrder.canTradeWith(buyOrder)) {
-                execute(sellOrder, buyOrder, BUY)
-            }
-        }
-    }
-
-    private fun execute(sellOrder: SellOrder, buyOrder: BuyOrder, transactionType: Order.Type) {
+    private fun execute(sellOrder: Order, buyOrder: Order, transactionType: Type) {
         log.info("m=execute, transactionType=$transactionType")
 
         val sellerWallet = walletQueryGateway.findById(sellOrder.walletId)
@@ -85,8 +77,8 @@ class TradeService(
     private fun exchangeMoney(
         sellerWallet: Wallet,
         buyerWallet: Wallet,
-        sellOrder: SellOrder,
-        buyOrder: BuyOrder
+        sellOrder: Order,
+        buyOrder: Order
     ): ExchangeMoneyResult {
 
         return if (thereHasMoreToSellThanToBuy(sellOrder, buyOrder)) {
@@ -116,7 +108,7 @@ class TradeService(
         }
     }
 
-    private fun exchangeAsssets(buyerWallet: Wallet, sellOrder: SellOrder, buyOrder: BuyOrder): Int {
+    private fun exchangeAsssets(buyerWallet: Wallet, sellOrder: Order, buyOrder: Order): Int {
         return if (thereHasMoreToSellThanToBuy(sellOrder, buyOrder)) {
             log.info("m=exchangeMoneyWithChange, thereHasMoreToSellThanToBuy=true")
 
@@ -157,8 +149,8 @@ class TradeService(
         amountOfBuyingAssets: Int,
         sellerWallet: Wallet,
         buyerWallet: Wallet,
-        sellOrder: SellOrder,
-        buyOrder: BuyOrder
+        sellOrder: Order,
+        buyOrder: Order
     ): ExchangeMoneyResult {
         log.info("m=exchangeMoneyWithChange, amountOfBuyingAssets=$amountOfBuyingAssets")
         val result = ExchangeMoneyResult()
@@ -182,11 +174,11 @@ class TradeService(
         return result
     }
 
-    private fun thereHasMoreToSellThanToBuy(sellOrder: SellOrder, buyOrder: BuyOrder): Boolean {
+    private fun thereHasMoreToSellThanToBuy(sellOrder: Order, buyOrder: Order): Boolean {
         return (sellOrder.size - buyOrder.size) > 0
     }
 
-    private fun thereHasLessToSellThanToBuy(sellOrder: SellOrder, buyOrder: BuyOrder): Boolean {
+    private fun thereHasLessToSellThanToBuy(sellOrder: Order, buyOrder: Order): Boolean {
         return (sellOrder.size - buyOrder.size) < 0
     }
 

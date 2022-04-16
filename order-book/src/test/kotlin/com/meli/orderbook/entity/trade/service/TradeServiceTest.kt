@@ -1,11 +1,11 @@
 package com.meli.orderbook.entity.trade.service
 
 import com.meli.orderbook.entity.order.gateway.OrderCommandGateway
-import com.meli.orderbook.entity.order.model.BuyOrder
 import com.meli.orderbook.entity.order.model.Order
 import com.meli.orderbook.entity.order.model.Order.State.CLOSED
 import com.meli.orderbook.entity.order.model.Order.State.IN_TRADE
-import com.meli.orderbook.entity.order.model.SellOrder
+import com.meli.orderbook.entity.order.model.Order.Type.BUY
+import com.meli.orderbook.entity.order.model.Order.Type.SELL
 import com.meli.orderbook.entity.trade.gateway.TradeHistoryCommandGateway
 import com.meli.orderbook.entity.trade.model.Trade
 import com.meli.orderbook.entity.wallet.gateway.WalletCommandGateway
@@ -50,9 +50,9 @@ class TradeServiceTest {
     @Test
     fun `Should not execute a trande when sell price is greater than buy price`() {
 
-        tradeService.executeBuy(
-            BuyOrder(BigDecimal("10"), 10, 2, dateTime, 2, IN_TRADE),
-            listOf(SellOrder(BigDecimal("15"), 10, 1, dateTime, 1, IN_TRADE))
+        tradeService.execute(
+            Order(2, BUY, BigDecimal("10"), 10, dateTime, IN_TRADE),
+            listOf(Order(1, SELL, BigDecimal("15"), 10, dateTime, IN_TRADE))
         )
 
         verify(exactly = 0) { walletQueryGateway.findById(any()) }
@@ -67,12 +67,12 @@ class TradeServiceTest {
     fun `Should execute a trande`(
         sellerWallet: Wallet,
         buyerWallet: Wallet,
-        sellOrder: SellOrder,
-        buyOrder: BuyOrder,
+        sellOrder: Order,
+        buyOrder: Order,
         expectedSellerWallet: Wallet,
         expectedBuyerWallet: Wallet,
-        expectedSellOrder: SellOrder,
-        expectedBuyOrder: BuyOrder,
+        expectedSellOrder: Order,
+        expectedBuyOrder: Order,
         expectedTrade: Trade
     ) {
         val walletsSlot = mutableListOf<Wallet>()
@@ -85,7 +85,7 @@ class TradeServiceTest {
         every { orderCommandGateway.update(capture(ordersSlot)) } just Runs
         every { tradeHistoryCommandGateway.register(capture(tradeSlot)) } just Runs
 
-        tradeService.executeSell(
+        tradeService.execute(
             sellOrder,
             listOf(buyOrder)
         )
@@ -152,13 +152,13 @@ class TradeServiceTest {
             return arguments(
                 Wallet(1, BigDecimal("10"), 10),
                 Wallet(2, BigDecimal("10"), 10),
-                SellOrder(BigDecimal("10"), 10, 1, dateTime, 1, IN_TRADE),
-                BuyOrder(BigDecimal("10"), 10, 2, dateTime, 2, IN_TRADE),
+                Order(1, SELL, BigDecimal("10"), 10, dateTime, IN_TRADE, 1),
+                Order(2, BUY, BigDecimal("10"), 10, dateTime, IN_TRADE, 2),
                 Wallet(1, BigDecimal("110"), 10),
                 Wallet(2, BigDecimal("10"), 20),
-                SellOrder(BigDecimal("10"), 0, 1, dateTime, 1, CLOSED),
-                BuyOrder(BigDecimal("10"), 0, 2, dateTime, 2, CLOSED),
-                Trade(1, 2, Order.Type.SELL, 10, BigDecimal("100"), BigDecimal("0"), dateTime)
+                Order(1, SELL, BigDecimal("10"), 0, dateTime, CLOSED, 1),
+                Order(2, BUY, BigDecimal("10"), 0, dateTime, CLOSED, 2),
+                Trade(1, 2, SELL, 10, BigDecimal("10"), BigDecimal("0"), dateTime)
             )
         }
 
@@ -166,13 +166,13 @@ class TradeServiceTest {
             return arguments(
                 Wallet(1, BigDecimal("10"), 10),
                 Wallet(2, BigDecimal("10"), 10),
-                SellOrder(BigDecimal("10"), 15, 1, dateTime, 1, IN_TRADE),
-                BuyOrder(BigDecimal("10"), 10, 2, dateTime, 2, IN_TRADE),
+                Order(1, SELL, BigDecimal("10"), 15, dateTime, IN_TRADE, 1),
+                Order(2, BUY, BigDecimal("10"), 10, dateTime, IN_TRADE, 2),
                 Wallet(1, BigDecimal("110"), 10),
                 Wallet(2, BigDecimal("10"), 20),
-                SellOrder(BigDecimal("10"), 5, 1, dateTime, 1, IN_TRADE),
-                BuyOrder(BigDecimal("10"), 0, 2, dateTime, 2, CLOSED),
-                Trade(1, 2, Order.Type.SELL, 10, BigDecimal("100"), BigDecimal("0"), dateTime)
+                Order(1, SELL, BigDecimal("10"), 5, dateTime, IN_TRADE, 1),
+                Order(2, BUY, BigDecimal("10"), 0, dateTime, CLOSED, 2),
+                Trade(1, 2, SELL, 10, BigDecimal("10"), BigDecimal("0"), dateTime)
             )
         }
 
@@ -180,13 +180,13 @@ class TradeServiceTest {
             return arguments(
                 Wallet(1, BigDecimal("10"), 10),
                 Wallet(2, BigDecimal("10"), 10),
-                SellOrder(BigDecimal("10"), 10, 1, dateTime, 1, IN_TRADE),
-                BuyOrder(BigDecimal("10"), 15, 2, dateTime, 2, IN_TRADE),
+                Order(1, SELL, BigDecimal("10"), 10, dateTime, IN_TRADE, 1),
+                Order(2, BUY, BigDecimal("10"), 15, dateTime, IN_TRADE, 2),
                 Wallet(1, BigDecimal("110"), 10),
                 Wallet(2, BigDecimal("10"), 20),
-                SellOrder(BigDecimal("10"), 0, 1, dateTime, 1, CLOSED),
-                BuyOrder(BigDecimal("10"), 5, 2, dateTime, 2, IN_TRADE),
-                Trade(1, 2, Order.Type.SELL, 10, BigDecimal("100"), BigDecimal("0"), dateTime)
+                Order(1, SELL, BigDecimal("10"), 0, dateTime, CLOSED, 1),
+                Order(2, BUY, BigDecimal("10"), 5, dateTime, IN_TRADE, 2),
+                Trade(1, 2, SELL, 10, BigDecimal("10"), BigDecimal("0"), dateTime)
             )
         }
 
@@ -194,13 +194,13 @@ class TradeServiceTest {
             return arguments(
                 Wallet(1, BigDecimal("10"), 10),
                 Wallet(2, BigDecimal("10"), 10),
-                SellOrder(BigDecimal("9"), 10, 1, dateTime, 1, IN_TRADE),
-                BuyOrder(BigDecimal("10"), 10, 2, dateTime, 2, IN_TRADE),
+                Order(1, SELL, BigDecimal("9"), 10, dateTime, IN_TRADE, 1),
+                Order(2, BUY, BigDecimal("10"), 10, dateTime, IN_TRADE, 2),
                 Wallet(1, BigDecimal("100"), 10),
                 Wallet(2, BigDecimal("20"), 20),
-                SellOrder(BigDecimal("9"), 0, 1, dateTime, 1, CLOSED),
-                BuyOrder(BigDecimal("10"), 0, 2, dateTime, 2, CLOSED),
-                Trade(1, 2, Order.Type.SELL, 10, BigDecimal("90"), BigDecimal("10"), dateTime)
+                Order(1, SELL, BigDecimal("9"), 0, dateTime, CLOSED, 1),
+                Order(2, BUY, BigDecimal("10"), 0, dateTime, CLOSED, 2),
+                Trade(1, 2, SELL, 10, BigDecimal("9"), BigDecimal("1"), dateTime)
             )
         }
 
@@ -208,13 +208,13 @@ class TradeServiceTest {
             return arguments(
                 Wallet(1, BigDecimal("10"), 10),
                 Wallet(2, BigDecimal("10"), 10),
-                SellOrder(BigDecimal("9"), 15, 1, dateTime, 1, IN_TRADE),
-                BuyOrder(BigDecimal("10"), 10, 2, dateTime, 2, IN_TRADE),
+                Order(1, SELL, BigDecimal("9"), 15, dateTime, IN_TRADE, 1),
+                Order(2, BUY, BigDecimal("10"), 10, dateTime, IN_TRADE, 2),
                 Wallet(1, BigDecimal("100"), 10),
                 Wallet(2, BigDecimal("20"), 20),
-                SellOrder(BigDecimal("9"), 5, 1, dateTime, 1, IN_TRADE),
-                BuyOrder(BigDecimal("10"), 0, 2, dateTime, 2, CLOSED),
-                Trade(1, 2, Order.Type.SELL, 10, BigDecimal("90"), BigDecimal("10"), dateTime)
+                Order(1, SELL, BigDecimal("9"), 5, dateTime, IN_TRADE, 1),
+                Order(2, BUY, BigDecimal("10"), 0, dateTime, CLOSED, 2),
+                Trade(1, 2, SELL, 10, BigDecimal("9"), BigDecimal("1"), dateTime)
             )
         }
 
@@ -222,13 +222,13 @@ class TradeServiceTest {
             return arguments(
                 Wallet(1, BigDecimal("10"), 10),
                 Wallet(2, BigDecimal("10"), 10),
-                SellOrder(BigDecimal("9"), 10, 1, dateTime, 1, IN_TRADE),
-                BuyOrder(BigDecimal("10"), 15, 2, dateTime, 2, IN_TRADE),
+                Order(1, SELL, BigDecimal("9"), 10, dateTime, IN_TRADE, 1),
+                Order(2, BUY, BigDecimal("10"), 15, dateTime, IN_TRADE, 2),
                 Wallet(1, BigDecimal("100"), 10),
                 Wallet(2, BigDecimal("20"), 20),
-                SellOrder(BigDecimal("9"), 0, 1, dateTime, 1, CLOSED),
-                BuyOrder(BigDecimal("10"), 5, 2, dateTime, 2, IN_TRADE),
-                Trade(1, 2, Order.Type.SELL, 10, BigDecimal("90"), BigDecimal("10"), dateTime)
+                Order(1, SELL, BigDecimal("9"), 0, dateTime, CLOSED, 1),
+                Order(2, BUY, BigDecimal("10"), 5, dateTime, IN_TRADE, 2),
+                Trade(1, 2, SELL, 10, BigDecimal("9"), BigDecimal("1"), dateTime)
             )
         }
     }

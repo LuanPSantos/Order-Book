@@ -1,7 +1,7 @@
 package com.meli.orderbook.infrastructure.order.controller
 
 import com.meli.orderbook.usecase.order.PlaceBuyOrderUseCase
-import com.meli.orderbook.usecase.order.PlaceBuyOrderUseCase.Input
+import com.meli.orderbook.usecase.order.PlaceOrderUseCase.Input
 
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody

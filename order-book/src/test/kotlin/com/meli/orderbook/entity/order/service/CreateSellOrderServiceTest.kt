@@ -1,9 +1,9 @@
 package com.meli.orderbook.entity.order.service
 
 import com.meli.orderbook.entity.order.gateway.OrderCommandGateway
+import com.meli.orderbook.entity.order.model.Order
 import com.meli.orderbook.entity.order.model.Order.State.CREATING
 import com.meli.orderbook.entity.order.model.Order.Type.SELL
-import com.meli.orderbook.entity.order.model.SellOrder
 import com.meli.orderbook.entity.wallet.model.Wallet
 import com.meli.orderbook.entity.wallet.gateway.WalletCommandGateway
 import com.meli.orderbook.entity.wallet.gateway.WalletQueryGateway
@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test
 import java.math.BigDecimal
 import java.time.LocalDateTime
 
-class CreateOrderServiceTest {
+class CreateSellOrderServiceTest {
 
     private val dateTime = LocalDateTime.now()
 
@@ -30,7 +30,7 @@ class CreateOrderServiceTest {
     lateinit var orderCommandGateway: OrderCommandGateway
 
     @InjectMockKs
-    lateinit var createOrderService: CreateOrderService
+    lateinit var createOrderService: CreateSellOrderService
 
     @BeforeEach
     fun setUp() = MockKAnnotations.init(this)
@@ -40,15 +40,15 @@ class CreateOrderServiceTest {
         val wallet = Wallet(1, BigDecimal("100"), 20)
 
         val walletSlot = slot<Wallet>()
-        val sellOrderSlot = slot<SellOrder>()
+        val sellOrderSlot = slot<Order>()
 
         every { walletQueryGateway.findById(eq(1)) } returns wallet
         every { walletCommandGateway.update(capture(walletSlot)) } just Runs
         every {
             orderCommandGateway.create(capture(sellOrderSlot))
-        } returns SellOrder(BigDecimal("14"), 10, 1, dateTime, 1)
+        } returns Order(1, SELL, BigDecimal("14"), 10, dateTime, id = 1)
 
-        val sellOrder = createOrderService.createSellOrder(SellOrder(BigDecimal("14"), 10, 1, dateTime))
+        val sellOrder = createOrderService.createOrder(Order(1, SELL, BigDecimal("14"), 10, dateTime))
 
         assertEquals(1, walletSlot.captured.id)
         assertEquals(BigDecimal("100"), walletSlot.captured.amountOfMoney)

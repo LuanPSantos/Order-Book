@@ -5,8 +5,7 @@ import com.meli.orderbook.entity.order.model.Order.Type.BUY
 import com.meli.orderbook.entity.order.model.Order.Type.SELL
 import com.meli.orderbook.entity.order.model.OrderBook
 import com.meli.orderbook.entity.order.gateway.OrderBookQueryGateway
-import com.meli.orderbook.entity.order.model.BuyOrder
-import com.meli.orderbook.entity.order.model.SellOrder
+import com.meli.orderbook.entity.order.model.Order
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
@@ -49,7 +48,7 @@ class GetOrderBookUseCaseTest {
         assertEquals(1, output.orderBook.asks[0].walletId)
         assertEquals(5, output.orderBook.asks[0].size)
 
-        assertEquals(1, output.orderBook.bids[0].id)
+        assertEquals(2, output.orderBook.bids[0].id)
         assertEquals(BUY, output.orderBook.bids[0].type)
         assertEquals(BigDecimal("110"), output.orderBook.bids[0].price)
         assertEquals(dateTime, output.orderBook.bids[0].creationDate)
@@ -63,10 +62,10 @@ class GetOrderBookUseCaseTest {
     private fun createOrderBook(): OrderBook {
         return OrderBook(
             listOf(
-                SellOrder(BigDecimal("200"), 5, 1, dateTime, 1, IN_TRADE)
+                Order(1, SELL, BigDecimal("200"), 5, dateTime, IN_TRADE, 1)
             ),
             listOf(
-                BuyOrder(BigDecimal("110"), 4, 2L, dateTime, 1, IN_TRADE)
+                Order(2, BUY, BigDecimal("110"), 4, dateTime, IN_TRADE, 2)
             )
         )
     }

@@ -32,9 +32,9 @@ class OrderBookTest {
     @Test
     fun `Should find matching sell-orders for a given buy-order`() {
         val orderBook = createOrderBook()
-        val buyOrder = BuyOrder(BigDecimal("200"), 5, 5, now(), state = IN_TRADE)
+        val buyOrder = Order(5, BUY, BigDecimal("200"), 5, now(), state = IN_TRADE)
 
-        val matchingSellOrders = orderBook.findMatchingSellOrders(buyOrder)
+        val matchingSellOrders = orderBook.findMatchingOrders(buyOrder)
 
         assertEquals(2, matchingSellOrders.size)
 
@@ -58,9 +58,9 @@ class OrderBookTest {
     @Test
     fun `Should find matching buy-orders for a given sell-order`() {
         val orderBook = createOrderBook()
-        val sellOrder = SellOrder(BigDecimal("220"), 5, 5L, now(), state = IN_TRADE)
+        val sellOrder = Order(5, SELL, BigDecimal("220"), 5, now(), state = IN_TRADE)
 
-        val matchingBuyOrders = orderBook.findMatchingBuyOrders(sellOrder)
+        val matchingBuyOrders = orderBook.findMatchingOrders(sellOrder)
 
         assertEquals(3, matchingBuyOrders.size)
 
@@ -94,16 +94,80 @@ class OrderBookTest {
 
         return OrderBook(
             listOf(
-                SellOrder(BigDecimal("200"), 5, 1, dateTime.plusMinutes(3), 1, IN_TRADE),
-                SellOrder(BigDecimal("100"), 1, 2, dateTime.plusMinutes(2), 2, IN_TRADE),
-                SellOrder(BigDecimal("300"), 2, 3, dateTime.plusMinutes(4), 3, IN_TRADE),
-                SellOrder(BigDecimal("300"), 4, 4, dateTime.plusMinutes(1), 4, IN_TRADE)
+                Order(
+                    id = 1,
+                    walletId = 1,
+                    type = SELL,
+                    price = BigDecimal("200"),
+                    size = 5,
+                    state = IN_TRADE,
+                    creationDate = dateTime.plusMinutes(3)
+                ),
+                Order(
+                    id = 2,
+                    walletId = 2,
+                    type = SELL,
+                    price = BigDecimal("100"),
+                    size = 1,
+                    state = IN_TRADE,
+                    creationDate = dateTime.plusMinutes(2)
+                ),
+                Order(
+                    id = 3,
+                    walletId = 3,
+                    type = SELL,
+                    price = BigDecimal("300"),
+                    size = 2,
+                    state = IN_TRADE,
+                    creationDate = dateTime.plusMinutes(4)
+                ),
+                Order(
+                    id = 4,
+                    walletId = 4,
+                    type = SELL,
+                    price = BigDecimal("300"),
+                    size = 4,
+                    state = IN_TRADE,
+                    creationDate = dateTime.plusMinutes(1)
+                )
             ),
             listOf(
-                BuyOrder(BigDecimal("110"), 4, 1L, dateTime.plusMinutes(4), 1, IN_TRADE),
-                BuyOrder(BigDecimal("220"), 6, 2L, dateTime.plusMinutes(2), 2, IN_TRADE),
-                BuyOrder(BigDecimal("220"), 7, 3L, dateTime.plusMinutes(3), 3, IN_TRADE),
-                BuyOrder(BigDecimal("355"), 2, 4L, dateTime.plusMinutes(1), 4, IN_TRADE)
+                Order(
+                    id = 1,
+                    walletId = 1,
+                    type = BUY,
+                    price = BigDecimal("110"),
+                    size = 4,
+                    state = IN_TRADE,
+                    creationDate = dateTime.plusMinutes(4)
+                ),
+                Order(
+                    id = 2,
+                    walletId = 2,
+                    type = BUY,
+                    price = BigDecimal("220"),
+                    size = 6,
+                    state = IN_TRADE,
+                    creationDate = dateTime.plusMinutes(2)
+                ),
+                Order(
+                    id = 3,
+                    walletId = 3,
+                    type = BUY,
+                    price = BigDecimal("220"),
+                    size = 7,
+                    state = IN_TRADE,
+                    creationDate = dateTime.plusMinutes(3)
+                ),
+                Order(
+                    id = 4,
+                    walletId = 4,
+                    type = BUY,
+                    price = BigDecimal("355"),
+                    size = 2,
+                    state = IN_TRADE,
+                    creationDate = dateTime.plusMinutes(1)
+                )
             )
         )
     }

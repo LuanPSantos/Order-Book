@@ -2,37 +2,22 @@ package com.meli.orderbook.usecase.order
 
 import com.meli.orderbook.entity.order.gateway.OrderCommandGateway
 import com.meli.orderbook.entity.order.gateway.OrderBookQueryGateway
-import com.meli.orderbook.entity.order.model.SellOrder
+import com.meli.orderbook.entity.order.model.Order
 import com.meli.orderbook.entity.order.service.CreateOrderService
+import com.meli.orderbook.entity.order.service.CreateSellOrderService
 import com.meli.orderbook.entity.trade.service.TradeService
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
 
 @Service
 class PlaceSellOrderUseCase(
-    private val orderBookQueryGateway: OrderBookQueryGateway,
-    private val orderCommandGateway: OrderCommandGateway,
-    private val createOrderService: CreateOrderService,
-    private val tradeService: TradeService
-) {
+    private val createOrderService: CreateSellOrderService,
+    orderBookQueryGateway: OrderBookQueryGateway,
+    orderCommandGateway: OrderCommandGateway,
+    tradeService: TradeService
+) : PlaceOrderUseCase(orderBookQueryGateway, orderCommandGateway, tradeService) {
 
-    fun execute(input: Input) {
-
-        val orderBook = orderBookQueryGateway.get()
-        val sellOrder = createOrderService.createSellOrder(SellOrder(input.price, input.size, input.walletId))
-
-        sellOrder.enableToTrade()
-
-        val matchedBuyOrders = orderBook.findMatchingBuyOrders(sellOrder)
-
-        tradeService.executeSell(sellOrder, matchedBuyOrders)
-
-        orderCommandGateway.update(sellOrder)
+    override fun createOrder(walletId: Long, size: Int, price: BigDecimal): Order {
+        return createOrderService.createOrder(Order(walletId, Order.Type.SELL, price, size))
     }
-
-    data class Input(
-        val walletId: Long,
-        val size: Int,
-        val price: BigDecimal
-    )
 }

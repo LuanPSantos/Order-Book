@@ -1,7 +1,7 @@
 package com.meli.orderbook.infrastructure.order.controller
 
+import com.meli.orderbook.usecase.order.PlaceOrderUseCase.Input
 import com.meli.orderbook.usecase.order.PlaceSellOrderUseCase
-import com.meli.orderbook.usecase.order.PlaceSellOrderUseCase.Input
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody

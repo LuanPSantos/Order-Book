@@ -3,13 +3,12 @@ package com.meli.orderbook.entity.order.model
 import java.math.BigDecimal
 import java.time.LocalDateTime
 
-// TODO remover heranca
 open class Order(
+    val walletId: Long,
     val type: Type,
     val price: BigDecimal,
     size: Int,
-    val creationDate: LocalDateTime,
-    val walletId: Long,
+    val creationDate: LocalDateTime = LocalDateTime.now(),
     state: State = State.CREATING,
     val id: Long? = null
 ) {
@@ -56,8 +55,15 @@ open class Order(
 
         this.size -= sizes
 
-        if(this.size == 0) {
+        if (this.size == 0) {
             close()
+        }
+    }
+
+    fun canTradeWith(otherOrder: Order): Boolean {
+        return when (type) {
+            Type.BUY -> otherOrder.size > 0 && otherOrder.price <= this.price && this.state == State.IN_TRADE && otherOrder.state == State.IN_TRADE
+            Type.SELL -> otherOrder.size > 0 && otherOrder.price >= this.price && this.state == State.IN_TRADE && otherOrder.state == State.IN_TRADE
         }
     }
 

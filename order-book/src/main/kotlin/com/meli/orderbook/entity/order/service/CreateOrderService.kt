@@ -1,16 +1,14 @@
 package com.meli.orderbook.entity.order.service
 
 import com.meli.orderbook.entity.order.gateway.OrderCommandGateway
-import com.meli.orderbook.entity.order.model.BuyOrder
-import com.meli.orderbook.entity.order.model.SellOrder
+import com.meli.orderbook.entity.order.model.Order
 import com.meli.orderbook.entity.wallet.gateway.WalletCommandGateway
 import com.meli.orderbook.entity.wallet.gateway.WalletQueryGateway
+import com.meli.orderbook.entity.wallet.model.Wallet
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import javax.transaction.Transactional
 
-@Service
-class CreateOrderService(
+abstract class CreateOrderService(
     private val walletQueryGateway: WalletQueryGateway,
     private val walletCommandGateway: WalletCommandGateway,
     private val orderCommandGateway: OrderCommandGateway,
@@ -18,49 +16,23 @@ class CreateOrderService(
 
     private val log = LoggerFactory.getLogger(this::class.java)
 
-    @Transactional
-    fun createBuyOrder(buyOrder: BuyOrder): BuyOrder {
-        val buyerWallet = walletQueryGateway.findById(buyOrder.walletId)
+    fun createOrder(order: Order): Order {
+        val wallet = walletQueryGateway.findById(order.walletId)
 
-        log.info("m=create, buyerWallet=$buyerWallet")
+        log.info("m=createOrder, buyerWallet=$wallet")
 
-        buyerWallet.subtractMoney(buyOrder.price.multiply(buyOrder.size.toBigDecimal()))
+        subtractValueFromWallet(wallet, order)
 
-        log.info("m=create, buyerWallet=$buyerWallet")
+        log.info("m=createOrder, buyerWallet=$wallet")
 
-        walletCommandGateway.update(buyerWallet)
+        walletCommandGateway.update(wallet)
 
-        val order = orderCommandGateway.create(buyOrder)
+        val createdOrder = orderCommandGateway.create(order)
 
-        log.info("m=create, buyOrder=$order")
+        log.info("m=createOrder, createdOrder=$createdOrder")
 
-        return BuyOrder(
-            order.price,
-            order.size,
-            order.walletId,
-            order.creationDate,
-            order.id,
-            order.state
-        )
+        return createdOrder
     }
 
-    @Transactional
-    fun createSellOrder(sellOrder: SellOrder): SellOrder {
-        val sellerWallet = walletQueryGateway.findById(sellOrder.walletId)
-
-        sellerWallet.subtractAssets(sellOrder.size)
-
-        walletCommandGateway.update(sellerWallet)
-
-        val order = orderCommandGateway.create(sellOrder)
-
-        return SellOrder(
-            order.price,
-            order.size,
-            order.walletId,
-            order.creationDate,
-            order.id,
-            order.state
-        )
-    }
+    protected abstract fun subtractValueFromWallet(wallet: Wallet, order: Order)
 }

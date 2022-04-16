@@ -2,16 +2,16 @@ package com.meli.orderbook.usecase.order
 
 import com.meli.orderbook.entity.order.gateway.OrderBookQueryGateway
 import com.meli.orderbook.entity.order.gateway.OrderCommandGateway
-import com.meli.orderbook.entity.order.model.BuyOrder
+import com.meli.orderbook.entity.order.model.Order
 import com.meli.orderbook.entity.order.model.Order.State.CREATING
 import com.meli.orderbook.entity.order.model.Order.State.IN_TRADE
 import com.meli.orderbook.entity.order.model.Order.Type.BUY
 import com.meli.orderbook.entity.order.model.Order.Type.SELL
 import com.meli.orderbook.entity.order.model.OrderBook
-import com.meli.orderbook.entity.order.model.SellOrder
+import com.meli.orderbook.entity.order.service.CreateBuyOrderService
 import com.meli.orderbook.entity.order.service.CreateOrderService
 import com.meli.orderbook.entity.trade.service.TradeService
-import com.meli.orderbook.usecase.order.PlaceBuyOrderUseCase.Input
+import com.meli.orderbook.usecase.order.PlaceOrderUseCase.Input
 import io.mockk.*
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
@@ -33,7 +33,7 @@ class PlaceBuyOrderUseCaseTest {
     lateinit var orderCommandGateway: OrderCommandGateway
 
     @MockK
-    lateinit var createOrderService: CreateOrderService
+    lateinit var createOrderService: CreateBuyOrderService
 
     @MockK
     lateinit var tradeService: TradeService
@@ -47,23 +47,23 @@ class PlaceBuyOrderUseCaseTest {
     @Test
     fun `Should place a buy-order whith matching sell-orders in the order-book`() {
 
-        val createBuyOrderSlot = slot<BuyOrder>()
-        val buyOrderSlot = slot<BuyOrder>()
-        val sellOrderSlot = slot<List<SellOrder>>()
-        val resolvedBuyOrderSlot = slot<BuyOrder>()
+        val createBuyOrderSlot = slot<Order>()
+        val buyOrderSlot = slot<Order>()
+        val sellOrderSlot = slot<List<Order>>()
+        val resolvedBuyOrderSlot = slot<Order>()
 
         every { orderBookQueryGateway.get() } returns createOrderBook()
         every {
-            createOrderService.createBuyOrder(capture(createBuyOrderSlot))
-        } returns BuyOrder(BigDecimal("250"), 10, 7, dateTime, 7)
-        every { tradeService.executeBuy(capture(buyOrderSlot), capture(sellOrderSlot)) } just Runs
+            createOrderService.createOrder(capture(createBuyOrderSlot))
+        } returns Order(7, BUY, BigDecimal("250"), 10, dateTime, id = 7)
+        every { tradeService.execute(capture(buyOrderSlot), capture(sellOrderSlot)) } just Runs
         every { orderCommandGateway.update(capture(resolvedBuyOrderSlot)) } just Runs
 
         placeBuyOrderUseCase.execute(Input(7, 10, BigDecimal("250")))
 
         verify(exactly = 1) { orderBookQueryGateway.get() }
-        verify(exactly = 1) { createOrderService.createBuyOrder(any()) }
-        verify(exactly = 1) { tradeService.executeBuy(any(), any()) }
+        verify(exactly = 1) { createOrderService.createOrder(any()) }
+        verify(exactly = 1) { tradeService.execute(any(), any()) }
         verify(exactly = 1) { orderCommandGateway.update(any()) }
 
         assertEquals(CREATING, createBuyOrderSlot.captured.state)
@@ -100,23 +100,23 @@ class PlaceBuyOrderUseCaseTest {
 
     @Test
     fun `Should place a buy-order in the order-book when has no matching sell-orders`() {
-        val createBuyOrderSlot = slot<BuyOrder>()
-        val buyOrderSlot = slot<BuyOrder>()
-        val sellOrderSlot = slot<List<SellOrder>>()
-        val resolvedBuyOrderSlot = slot<BuyOrder>()
+        val createBuyOrderSlot = slot<Order>()
+        val buyOrderSlot = slot<Order>()
+        val sellOrderSlot = slot<List<Order>>()
+        val resolvedBuyOrderSlot = slot<Order>()
 
         every { orderBookQueryGateway.get() } returns createOrderBook()
         every {
-            createOrderService.createBuyOrder(capture(createBuyOrderSlot))
-        } returns BuyOrder(BigDecimal("200"), 10, 7, dateTime, 7)
-        every { tradeService.executeBuy(capture(buyOrderSlot), capture(sellOrderSlot)) } just Runs
+            createOrderService.createOrder(capture(createBuyOrderSlot))
+        } returns Order(7, BUY, BigDecimal("200"), 10, dateTime, id = 7)
+        every { tradeService.execute(capture(buyOrderSlot), capture(sellOrderSlot)) } just Runs
         every { orderCommandGateway.update(capture(resolvedBuyOrderSlot)) } just Runs
 
         placeBuyOrderUseCase.execute(Input(7, 10, BigDecimal("200")))
 
         verify(exactly = 1) { orderBookQueryGateway.get() }
-        verify(exactly = 1) { createOrderService.createBuyOrder(any()) }
-        verify(exactly = 1) { tradeService.executeBuy(any(), any()) }
+        verify(exactly = 1) { createOrderService.createOrder(any()) }
+        verify(exactly = 1) { tradeService.execute(any(), any()) }
         verify(exactly = 1) { orderCommandGateway.update(any()) }
 
         assertEquals(CREATING, createBuyOrderSlot.captured.state)
@@ -147,13 +147,13 @@ class PlaceBuyOrderUseCaseTest {
     private fun createOrderBook(): OrderBook {
         return OrderBook(
             listOf(
-                SellOrder(BigDecimal("300"), 5, 1, dateTime, 1, IN_TRADE),
-                SellOrder(BigDecimal("250"), 3, 3, dateTime, 3, IN_TRADE)
+                Order(1, SELL, BigDecimal("300"), 5, dateTime, IN_TRADE, 1),
+                Order(3, SELL, BigDecimal("250"), 3, dateTime, IN_TRADE, 3)
             ),
             listOf(
-                BuyOrder(BigDecimal("110"), 4, 2, dateTime, 2, IN_TRADE),
-                BuyOrder(BigDecimal("210"), 6, 4, dateTime, 4, IN_TRADE),
-                BuyOrder(BigDecimal("210"), 4, 8, dateTime.plusMinutes(1), 8, IN_TRADE)
+                Order(2, BUY, BigDecimal("110"), 4, dateTime, IN_TRADE, 2),
+                Order(4, BUY, BigDecimal("210"), 6, dateTime, IN_TRADE, 4),
+                Order(8, BUY, BigDecimal("210"), 4, dateTime.plusMinutes(1), IN_TRADE, 8)
             )
         )
     }
