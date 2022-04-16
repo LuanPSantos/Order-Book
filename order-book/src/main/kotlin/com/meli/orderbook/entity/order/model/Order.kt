@@ -3,6 +3,7 @@ package com.meli.orderbook.entity.order.model
 import java.math.BigDecimal
 import java.time.LocalDateTime
 
+// TODO remover heranca
 open class Order(
     val type: Type,
     val price: BigDecimal,

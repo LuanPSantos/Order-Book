@@ -165,14 +165,14 @@ class TradeService(
 
         val totalInTransaction = sellOrder.price.multiply(amountOfBuyingAssets.toBigDecimal())
 
-        result.totalExchanged = totalInTransaction
+        result.totalExchanged = sellOrder.price
 
         sellerWallet.depositMoney(totalInTransaction)
 
         if (buyOrder.price > sellOrder.price) {
             val change = buyOrder.price - sellOrder.price
             val totalInChange = change.multiply(amountOfBuyingAssets.toBigDecimal())
-            result.change = totalInChange
+            result.change = change
 
             buyerWallet.depositMoney(totalInChange)
         }

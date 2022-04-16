@@ -60,7 +60,7 @@ class PlaceSellOrderUseCaseTest {
         placeSellOrderUseCase.execute(PlaceSellOrderUseCase.Input(7, 10, BigDecimal("210")))
 
         verify(exactly = 1) { orderBookQueryGateway.get() }
-        verify(exactly = 1) { createOrderService.createBuyOrder(any()) }
+        verify(exactly = 1) { createOrderService.createSellOrder(any()) }
         verify(exactly = 1) { tradeService.executeSell(any(), any()) }
         verify(exactly = 1) { orderCommandGateway.update(any()) }
 
@@ -121,7 +121,7 @@ class PlaceSellOrderUseCaseTest {
         placeSellOrderUseCase.execute(PlaceSellOrderUseCase.Input(7, 10, BigDecimal("410")))
 
         verify(exactly = 1) { orderBookQueryGateway.get() }
-        verify(exactly = 1) { createOrderService.createBuyOrder(any()) }
+        verify(exactly = 1) { createOrderService.createSellOrder(any()) }
         verify(exactly = 1) { tradeService.executeSell(any(), any()) }
         verify(exactly = 1) { orderCommandGateway.update(any()) }
 
