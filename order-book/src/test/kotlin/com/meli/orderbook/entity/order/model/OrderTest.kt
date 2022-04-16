@@ -138,7 +138,7 @@ class OrderTest {
         val sellOrder = Order(1, SELL, BigDecimal.TEN, 10, dateTime, IN_TRADE)
 
         val exception = assertThrows<java.lang.IllegalArgumentException> {
-            sellOrder.subractSizes(-1)
+            sellOrder.subractSize(-1)
         }
 
         assertEquals("Subtract negative value not allowed", exception.message)
@@ -150,7 +150,7 @@ class OrderTest {
     fun `Should subtract size value`() {
         val sellOrder = Order(1, SELL, BigDecimal.TEN, 10, dateTime, IN_TRADE)
 
-        sellOrder.subractSizes(5)
+        sellOrder.subractSize(5)
 
         assertEquals(IN_TRADE, sellOrder.state)
         assertEquals(5, sellOrder.size)
@@ -160,7 +160,7 @@ class OrderTest {
     fun `Should subtract all size value and close order`() {
         val sellOrder = Order(1, SELL, BigDecimal.TEN, 10, dateTime, IN_TRADE)
 
-        sellOrder.subractSizes(10)
+        sellOrder.subractSize(10)
 
         assertEquals(CLOSED, sellOrder.state)
         assertEquals(0, sellOrder.size)

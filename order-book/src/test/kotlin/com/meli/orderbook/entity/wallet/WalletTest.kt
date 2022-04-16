@@ -14,12 +14,12 @@ class WalletTest {
         val wallet = Wallet(1, BigDecimal.TEN, 5)
 
         val exception = assertThrows<IllegalArgumentException> {
-            wallet.subtractAssets(-1)
+            wallet.subtractVibranium(-1)
         }
 
         assertEquals("Invalid size to subtract", exception.message)
 
-        assertEquals(5, wallet.amountOfAssets)
+        assertEquals(5, wallet.amountOfVibranium)
         assertEquals(1, wallet.id)
         assertEquals(BigDecimal.TEN, wallet.amountOfMoney)
     }
@@ -29,12 +29,12 @@ class WalletTest {
         val wallet = Wallet(1, BigDecimal.TEN, 5)
 
         val exception = assertThrows<IllegalArgumentException> {
-            wallet.subtractAssets(15)
+            wallet.subtractVibranium(15)
         }
 
         assertEquals("Invalid size to subtract", exception.message)
 
-        assertEquals(5, wallet.amountOfAssets)
+        assertEquals(5, wallet.amountOfVibranium)
         assertEquals(1, wallet.id)
         assertEquals(BigDecimal.TEN, wallet.amountOfMoney)
     }
@@ -44,12 +44,12 @@ class WalletTest {
         val wallet = Wallet(1, BigDecimal.TEN, 5)
 
         val exception = assertThrows<IllegalArgumentException> {
-            wallet.depositAssets(-1)
+            wallet.depositVibranium(-1)
         }
 
         assertEquals("Invalid size to deposit", exception.message)
 
-        assertEquals(5, wallet.amountOfAssets)
+        assertEquals(5, wallet.amountOfVibranium)
         assertEquals(1, wallet.id)
         assertEquals(BigDecimal.TEN, wallet.amountOfMoney)
     }
@@ -58,9 +58,9 @@ class WalletTest {
     fun `Should  deposit when size to wallet`() {
         val wallet = Wallet(1, BigDecimal.TEN, 5)
 
-        wallet.depositAssets(5)
+        wallet.depositVibranium(5)
 
-        assertEquals(10, wallet.amountOfAssets)
+        assertEquals(10, wallet.amountOfVibranium)
         assertEquals(1, wallet.id)
         assertEquals(BigDecimal.TEN, wallet.amountOfMoney)
     }
@@ -69,9 +69,9 @@ class WalletTest {
     fun `Should subtract a valid size`() {
         val wallet = Wallet(1, BigDecimal.TEN, 5)
 
-        wallet.subtractAssets(3)
+        wallet.subtractVibranium(3)
 
-        assertEquals(2, wallet.amountOfAssets)
+        assertEquals(2, wallet.amountOfVibranium)
         assertEquals(1, wallet.id)
         assertEquals(BigDecimal.TEN, wallet.amountOfMoney)
     }
@@ -84,7 +84,7 @@ class WalletTest {
 
         assertEquals(BigDecimal("20"), wallet.amountOfMoney)
         assertEquals(1, wallet.id)
-        assertEquals(5, wallet.amountOfAssets)
+        assertEquals(5, wallet.amountOfVibranium)
     }
 
     @Test
@@ -99,6 +99,6 @@ class WalletTest {
 
         assertEquals(BigDecimal("10"), wallet.amountOfMoney)
         assertEquals(1, wallet.id)
-        assertEquals(5, wallet.amountOfAssets)
+        assertEquals(5, wallet.amountOfVibranium)
     }
 }

@@ -14,12 +14,12 @@ class WalletDatabaseGateway(
 
     override fun update(wallet: Wallet) {
 
-        walletRepository.save(WalletSchema(wallet.id, wallet.amountOfMoney, wallet.amountOfAssets))
+        walletRepository.save(WalletSchema(wallet.id, wallet.amountOfMoney, wallet.amountOfVibranium))
     }
 
     override fun findById(id: Long): Wallet {
         val schema = walletRepository.findWalletById(id)
 
-        return Wallet(schema.id, schema.amountOfMoney, schema.amountOfAssets)
+        return Wallet(schema.id, schema.amountOfMoney, schema.amountOfVibranium)
     }
 }

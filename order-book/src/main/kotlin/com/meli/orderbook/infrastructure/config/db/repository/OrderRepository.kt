@@ -12,7 +12,7 @@ interface OrderRepository : JpaRepository<OrderSchema, Long> {
                 "WHERE order.state = :state " +
                 "AND order.type = :type"
     )
-    fun findByStateAndType(state: Order.State, type: Order.Type): List<OrderSchema>
+    fun findOrdersByStateAndType(state: Order.State, type: Order.Type): List<OrderSchema>
 
     @Query(
         "SELECT order FROM OrderSchema order " +

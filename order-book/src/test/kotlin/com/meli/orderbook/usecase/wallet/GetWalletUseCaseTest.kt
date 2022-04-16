@@ -31,6 +31,6 @@ class GetWalletUseCaseTest {
 
         assertEquals(1, output.wallet.id)
         assertEquals(BigDecimal("10"), output.wallet.amountOfMoney)
-        assertEquals(10, output.wallet.amountOfAssets)
+        assertEquals(10, output.wallet.amountOfVibranium)
     }
 }

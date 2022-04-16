@@ -5,7 +5,6 @@ import com.meli.orderbook.entity.order.gateway.OrderQueryGateway
 import com.meli.orderbook.entity.order.model.Order
 import com.meli.orderbook.entity.order.model.Order.State.CANCELLED
 import com.meli.orderbook.entity.order.model.Order.State.IN_TRADE
-import com.meli.orderbook.entity.order.model.Order.Type.BUY
 import com.meli.orderbook.entity.order.model.Order.Type.SELL
 import com.meli.orderbook.entity.wallet.gateway.WalletCommandGateway
 import com.meli.orderbook.entity.wallet.gateway.WalletQueryGateway
@@ -64,7 +63,7 @@ class CancelSellOrderUseCaseTest {
         assertEquals(1, orderSlot.captured.id)
 
         assertEquals(1, walletSlot.captured.id)
-        assertEquals(20, walletSlot.captured.amountOfAssets)
+        assertEquals(20, walletSlot.captured.amountOfVibranium)
         assertEquals(BigDecimal("10"), walletSlot.captured.amountOfMoney)
     }
 }

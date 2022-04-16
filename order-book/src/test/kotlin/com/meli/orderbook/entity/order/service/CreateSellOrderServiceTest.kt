@@ -52,7 +52,7 @@ class CreateSellOrderServiceTest {
 
         assertEquals(1, walletSlot.captured.id)
         assertEquals(BigDecimal("100"), walletSlot.captured.amountOfMoney)
-        assertEquals(10, walletSlot.captured.amountOfAssets)
+        assertEquals(10, walletSlot.captured.amountOfVibranium)
 
         assertEquals(null, sellOrderSlot.captured.id)
         assertEquals(10, sellOrderSlot.captured.size)

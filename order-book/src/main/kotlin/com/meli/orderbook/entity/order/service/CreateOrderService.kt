@@ -19,11 +19,11 @@ abstract class CreateOrderService(
     fun createOrder(order: Order): Order {
         val wallet = walletQueryGateway.findById(order.walletId)
 
-        log.info("m=createOrder, buyerWallet=$wallet")
+        log.info("m=createOrder, wallet=$wallet")
 
         subtractValueFromWallet(wallet, order)
 
-        log.info("m=createOrder, buyerWallet=$wallet")
+        log.info("m=createOrder, wallet=$wallet")
 
         walletCommandGateway.update(wallet)
 

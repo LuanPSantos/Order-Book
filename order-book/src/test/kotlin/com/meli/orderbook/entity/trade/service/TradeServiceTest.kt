@@ -98,12 +98,12 @@ class TradeServiceTest {
 
         val sellerWalletCaptured = walletsSlot.find { it.id == sellerWallet.id }
         assertEquals(expectedSellerWallet.id, sellerWalletCaptured?.id)
-        assertEquals(expectedSellerWallet.amountOfAssets, sellerWalletCaptured?.amountOfAssets)
+        assertEquals(expectedSellerWallet.amountOfVibranium, sellerWalletCaptured?.amountOfVibranium)
         assertEquals(expectedSellerWallet.amountOfMoney, sellerWalletCaptured?.amountOfMoney)
 
         val buyerWalletCaptured = walletsSlot.find { it.id == buyerWallet.id }
         assertEquals(expectedBuyerWallet.id, buyerWalletCaptured?.id)
-        assertEquals(expectedBuyerWallet.amountOfAssets, buyerWalletCaptured?.amountOfAssets)
+        assertEquals(expectedBuyerWallet.amountOfVibranium, buyerWalletCaptured?.amountOfVibranium)
         assertEquals(expectedBuyerWallet.amountOfMoney, buyerWalletCaptured?.amountOfMoney)
 
         val sellOrderCaptured = ordersSlot.find { it.id == sellOrder.id }

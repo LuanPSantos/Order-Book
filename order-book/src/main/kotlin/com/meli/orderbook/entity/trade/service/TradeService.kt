@@ -70,7 +70,7 @@ class TradeService(
                 buyerWallet.id,
                 transactionType,
                 transactionedAssets,
-                transactionedMoney.totalExchanged,
+                transactionedMoney.price,
                 transactionedMoney.change
             )
         )
@@ -86,10 +86,8 @@ class TradeService(
         return if (thereHasMoreToSellThanToBuy(sellOrder, buyOrder)) {
             log.info("m=exchangeMoney, thereHasMoreToSellThanToBuy=true")
 
-            val amountOfBuyingAssets = buyOrder.size
-
             exchangeMoneyWithChange(
-                amountOfBuyingAssets,
+                buyOrder.size,
                 sellerWallet,
                 buyerWallet,
                 sellOrder,
@@ -98,10 +96,8 @@ class TradeService(
         } else {
             log.info("m=exchangeMoney, thereHasMoreToSellThanToBuy=false")
 
-            val amountOfSellingAssets = sellOrder.size
-
             exchangeMoneyWithChange(
-                amountOfSellingAssets,
+                sellOrder.size,
                 sellerWallet,
                 buyerWallet,
                 sellOrder,
@@ -112,66 +108,55 @@ class TradeService(
 
     private fun exchangeAsssets(buyerWallet: Wallet, sellOrder: Order, buyOrder: Order): Int {
         return if (thereHasMoreToSellThanToBuy(sellOrder, buyOrder)) {
-            log.info("m=exchangeMoneyWithChange, thereHasMoreToSellThanToBuy=true")
+            log.info("m=exchangeAsssets, thereHasMoreToSellThanToBuy=true")
 
-            val amountOfBuyingAssets = buyOrder.subtractAllSize()
-            sellOrder.subractSizes(amountOfBuyingAssets)
+            val buySize = buyOrder.subtractAllSize()
+            sellOrder.subractSize(buySize)
 
-            buyerWallet.depositAssets(amountOfBuyingAssets)
+            buyerWallet.depositVibranium(buySize)
 
-            log.info("m=exchangeMoneyWithChange, amountOfBuyingAssets=$amountOfBuyingAssets")
+            log.info("m=exchangeAsssets, buySize=$buySize")
 
-            amountOfBuyingAssets
-        } else if (thereHasLessToSellThanToBuy(sellOrder, buyOrder)) {
-            log.info("m=exchangeMoneyWithChange, thereHasMoreToSellThanToBuy=false")
-
-            val amountOfSellingAssets = sellOrder.subtractAllSize()
-            buyOrder.subractSizes(amountOfSellingAssets)
-
-            buyerWallet.depositAssets(amountOfSellingAssets)
-
-            log.info("m=exchangeMoneyWithChange, amountOfSellingAssets=$amountOfSellingAssets")
-
-            amountOfSellingAssets
+            buySize
         } else {
-            log.info("m=exchangeMoneyWithChange, thereHasMoreToSellThanToBuy=equal")
+            log.info("m=exchangeAsssets, thereHasMoreToSellThanToBuy=false")
 
-            val assets = sellOrder.subtractAllSize()
-            buyOrder.subtractAllSize()
+            val sellSize = sellOrder.subtractAllSize()
+            buyOrder.subractSize(sellSize)
 
-            buyerWallet.depositAssets(assets)
+            buyerWallet.depositVibranium(sellSize)
 
-            log.info("m=exchangeMoneyWithChange, assets=$assets")
+            log.info("m=exchangeAsssets, sellSize=$sellSize")
 
-            assets
+            sellSize
         }
     }
 
     private fun exchangeMoneyWithChange(
-        amountOfBuyingAssets: Int,
+        size: Int,
         sellerWallet: Wallet,
         buyerWallet: Wallet,
         sellOrder: Order,
         buyOrder: Order
     ): ExchangeMoneyResult {
-        log.info("m=exchangeMoneyWithChange, amountOfBuyingAssets=$amountOfBuyingAssets")
+        log.info("m=exchangeMoneyWithChange, size=$size")
         val result = ExchangeMoneyResult()
+        result.price = sellOrder.price
 
-        val totalInTransaction = sellOrder.price.multiply(amountOfBuyingAssets.toBigDecimal())
-
-        result.totalExchanged = sellOrder.price
+        val totalInTransaction = sellOrder.price.multiply(size.toBigDecimal())
 
         sellerWallet.depositMoney(totalInTransaction)
 
         if (buyOrder.price > sellOrder.price) {
             val change = buyOrder.price - sellOrder.price
-            val totalInChange = change.multiply(amountOfBuyingAssets.toBigDecimal())
             result.change = change
+
+            val totalInChange = change.multiply(size.toBigDecimal())
 
             buyerWallet.depositMoney(totalInChange)
         }
 
-        log.info("m=exchangeMoneyWithChange, totalInTransaction=${result.totalExchanged}, totalInChange=${result.change}")
+        log.info("m=exchangeMoneyWithChange, totalInTransaction=${result.price}, totalInChange=${result.change}")
 
         return result
     }
@@ -180,12 +165,8 @@ class TradeService(
         return (sellOrder.size - buyOrder.size) > 0
     }
 
-    private fun thereHasLessToSellThanToBuy(sellOrder: Order, buyOrder: Order): Boolean {
-        return (sellOrder.size - buyOrder.size) < 0
-    }
-
     data class ExchangeMoneyResult(
-        var totalExchanged: BigDecimal = BigDecimal.ZERO,
+        var price: BigDecimal = BigDecimal.ZERO,
         var change: BigDecimal = BigDecimal.ZERO
     )
 }

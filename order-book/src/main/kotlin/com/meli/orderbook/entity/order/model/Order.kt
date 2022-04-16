@@ -48,12 +48,12 @@ open class Order(
         return allSizes
     }
 
-    fun subractSizes(sizes: Int) {
-        if (sizes < 0) {
+    fun subractSize(size: Int) {
+        if (size < 0) {
             throw IllegalArgumentException("Subtract negative value not allowed")
         }
 
-        this.size -= sizes
+        this.size -= size
 
         if (this.size == 0) {
             close()
@@ -70,7 +70,6 @@ open class Order(
     override fun toString(): String {
         return "Order(type=$type, price=$price, creationDate=$creationDate, walletId=$walletId, id=$id, state=$state, size=$size)"
     }
-
 
     enum class Type {
         SELL, BUY

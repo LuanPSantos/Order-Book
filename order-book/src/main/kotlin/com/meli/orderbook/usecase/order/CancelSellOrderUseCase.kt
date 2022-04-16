@@ -27,6 +27,6 @@ class CancelSellOrderUseCase(
 
         order.cancel()
 
-        wallet.depositAssets(sizes)
+        wallet.depositVibranium(sizes)
     }
 }

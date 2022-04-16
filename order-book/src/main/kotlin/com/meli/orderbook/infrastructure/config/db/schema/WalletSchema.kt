@@ -12,5 +12,5 @@ class WalletSchema(
     @field:GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long,
     val amountOfMoney: BigDecimal,
-    val amountOfAssets: Int
+    val amountOfVibranium: Int
 )
