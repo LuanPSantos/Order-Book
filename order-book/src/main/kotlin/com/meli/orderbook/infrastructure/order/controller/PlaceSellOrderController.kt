@@ -17,7 +17,8 @@ class PlaceSellOrderController(
 
     @PostMapping("api/v1/order-books/asks")
     fun placeSellOrder(@RequestBody request: Request) {
-        log.info("m=placeSellOrder")
+        log.info("m=placeSellOrder, walletId=${request.walletId}, size=${request.size}, price=${request.price}")
+
         placeSellOrderUseCase.execute(Input(request.walletId, request.size, request.price))
     }
 

@@ -7,6 +7,7 @@ import com.meli.orderbook.entity.order.model.Order.Type.BUY
 import com.meli.orderbook.entity.order.service.CreateBuyOrderService
 import com.meli.orderbook.entity.order.service.CreateOrderService
 import com.meli.orderbook.entity.trade.service.TradeService
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
 
@@ -18,7 +19,11 @@ class PlaceBuyOrderUseCase(
     tradeService: TradeService
 ) : PlaceOrderUseCase(orderBookQueryGateway, orderCommandGateway, tradeService) {
 
+    private val log = LoggerFactory.getLogger(this::class.java)
+
     override fun createOrder(walletId: Long, size: Int, price: BigDecimal): Order {
+        log.info("m=createOrder, walletId=$walletId, size=$size, price=$price")
+
         return createOrderService.createOrder(Order(walletId, BUY, price, size))
     }
 }

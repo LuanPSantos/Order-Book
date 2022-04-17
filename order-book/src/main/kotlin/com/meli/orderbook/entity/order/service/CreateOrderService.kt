@@ -17,21 +17,15 @@ abstract class CreateOrderService(
     private val log = LoggerFactory.getLogger(this::class.java)
 
     fun createOrder(order: Order): Order {
-        val wallet = walletQueryGateway.findById(order.walletId)
+        log.info("m=createOrder, order=$order")
 
-        log.info("m=createOrder, wallet=$wallet")
+        val wallet = walletQueryGateway.findById(order.walletId)
 
         subtractValueFromWallet(wallet, order)
 
-        log.info("m=createOrder, wallet=$wallet")
-
         walletCommandGateway.update(wallet)
 
-        val createdOrder = orderCommandGateway.create(order)
-
-        log.info("m=createOrder, createdOrder=$createdOrder")
-
-        return createdOrder
+        return orderCommandGateway.create(order)
     }
 
     protected abstract fun subtractValueFromWallet(wallet: Wallet, order: Order)

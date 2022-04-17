@@ -1,5 +1,6 @@
 package com.meli.orderbook.entity.order.model
 
+import org.slf4j.LoggerFactory
 import java.math.BigDecimal
 import java.time.LocalDateTime
 
@@ -12,6 +13,8 @@ open class Order(
     state: State = State.CREATING,
     val id: Long? = null
 ) {
+
+    private val log = LoggerFactory.getLogger(this::class.java)
 
     var state: State = state
         private set
@@ -49,6 +52,7 @@ open class Order(
     }
 
     fun subractSize(size: Int) {
+        log.info("m=subractSize, size=$size, orderId=${this.id}")
         if (size < 0) {
             throw IllegalArgumentException("Subtract negative value not allowed")
         }
@@ -61,6 +65,7 @@ open class Order(
     }
 
     fun canTradeWith(otherOrder: Order): Boolean {
+        log.info("m=canTradeWith, otherOrderId=${otherOrder.id}, orderId=${this.id}")
         return when (type) {
             Type.BUY -> otherOrder.size > 0 && otherOrder.price <= this.price && this.state == State.IN_TRADE && otherOrder.state == State.IN_TRADE
             Type.SELL -> otherOrder.size > 0 && otherOrder.price >= this.price && this.state == State.IN_TRADE && otherOrder.state == State.IN_TRADE

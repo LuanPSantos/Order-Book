@@ -6,6 +6,7 @@ import com.meli.orderbook.entity.order.model.Order
 import com.meli.orderbook.entity.wallet.gateway.WalletCommandGateway
 import com.meli.orderbook.entity.wallet.gateway.WalletQueryGateway
 import com.meli.orderbook.entity.wallet.model.Wallet
+import org.slf4j.LoggerFactory
 
 abstract class CancelOrderUseCase(
     private val orderQueryGateway: OrderQueryGateway,
@@ -14,7 +15,10 @@ abstract class CancelOrderUseCase(
     private val walletCommandGateway: WalletCommandGateway
 ) {
 
+    private val log = LoggerFactory.getLogger(this::class.java)
+
     fun execute(input: Input) {
+        log.info("m=execute, orderId=${input.orderId}")
 
         val order = getSellOrder(input.orderId)
         val wallet = walletQueryGateway.findById(order.walletId)

@@ -7,6 +7,7 @@ import com.meli.orderbook.entity.order.model.Order.Type.SELL
 import com.meli.orderbook.entity.wallet.gateway.WalletQueryGateway
 import com.meli.orderbook.entity.wallet.model.Wallet
 import com.meli.orderbook.usecase.wallet.GetWalletUseCase.Output.InTrade
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
 
@@ -16,7 +17,10 @@ class GetWalletUseCase(
     private val orderQueryGateway: OrderQueryGateway
 ) {
 
+    private val log = LoggerFactory.getLogger(this::class.java)
+
     fun execute(input: Input): Output {
+        log.info("m=execute, walletId=${input.walletId}")
 
         val wallet = walletQueryGateway.findById(input.walletId)
 
@@ -33,6 +37,8 @@ class GetWalletUseCase(
             .filter { it.type == SELL }
             .map { it.size }
             .forEach { totalSizeInTrade += it }
+
+        log.info("m=execute, totalMoneyInTrade=$totalMoneyInTrade, totalSizeInTrade=$totalSizeInTrade")
 
         return Output(wallet, InTrade(totalMoneyInTrade, totalSizeInTrade))
     }

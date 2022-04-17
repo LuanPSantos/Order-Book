@@ -16,7 +16,13 @@ class CreateBuyOrderService(
     orderCommandGateway: OrderCommandGateway,
 ) : CreateOrderService(walletQueryGateway, walletCommandGateway, orderCommandGateway) {
 
+    private val log = LoggerFactory.getLogger(this::class.java)
+
     override fun subtractValueFromWallet(wallet: Wallet, order: Order) {
-        wallet.subtractMoney(order.price.multiply(order.size.toBigDecimal()))
+        val value = order.price.multiply(order.size.toBigDecimal())
+
+        log.info("m=subtractValueFromWallet, value=$value")
+
+        wallet.subtractMoney(value)
     }
 }

@@ -47,20 +47,14 @@ class TradeService(
         val sellerWallet = walletQueryGateway.findById(sellOrder.walletId)
         val buyerWallet = walletQueryGateway.findById(buyOrder.walletId)
 
-        log.info("m=execute, sellerWallet=${sellerWallet}, buyerWallet=${buyerWallet}")
-
         val transactionedMoney = exchangeMoney(sellerWallet, buyerWallet, sellOrder, buyOrder)
         val transactionedAssets = exchangeAsssets(buyerWallet, sellOrder, buyOrder)
 
         orderCommandGateway.update(sellOrder)
         orderCommandGateway.update(buyOrder)
 
-        log.info("m=execute, sellOrder=$sellOrder, buyOrder=$buyOrder")
-
         walletCommandGateway.update(sellerWallet)
         walletCommandGateway.update(buyerWallet)
-
-        log.info("m=execute, sellerWallet=$sellerWallet, buyerWallet=$buyerWallet")
 
         tradeHistoryCommandGateway.register(
             Trade(
