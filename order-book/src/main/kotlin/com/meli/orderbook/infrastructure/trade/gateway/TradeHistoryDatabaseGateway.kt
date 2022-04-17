@@ -48,7 +48,7 @@ class TradeHistoryDatabaseGateway(
                 it.type!!,
                 it.size!!,
                 it.price!!,
-                it.change!!,
+                it.changeMoney!!,
                 it.creationDate!!,
                 it.id
             )

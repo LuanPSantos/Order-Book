@@ -13,10 +13,10 @@ class CancelSellOrderController(
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
 
-    @DeleteMapping("api/v1/order-books/asks/{id}")
-    fun cancelSellOrder(@PathVariable id: Long) {
-        log.info("m=cancelSellOrder, orderId=$id")
+    @DeleteMapping("api/v1/order-books/asks/{orderId}")
+    fun cancelSellOrder(@PathVariable orderId: Long) {
+        log.info("m=cancelSellOrder, orderId=$orderId")
 
-        cancelSellOrderUseCase.execute(Input(id))
+        cancelSellOrderUseCase.execute(Input(orderId))
     }
 }

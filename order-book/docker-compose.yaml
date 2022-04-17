@@ -1,0 +1,34 @@
+services:
+  order-book:
+    image: on-luan/order-book
+    build:
+      context: .
+    container_name: order-book
+    ports:
+      - 8081:80
+    entrypoint: java -jar -Dspring.profiles.active=prod ./app.jar
+    networks:
+      - order-book-network
+
+  order-book-db:
+    image: mariadb:latest
+    command: --innodb-use-native-aio=0
+    container_name: order-book-db
+    restart: always
+    tty: true
+    volumes:
+      - type: volume
+        source: order-book-db
+        target: /var/lib/mysql
+    environment:
+      - MYSQL_DATABASE=order-book-db
+      - MYSQL_ROOT_PASSWORD=root
+    networks:
+      - order-book-network
+
+volumes:
+  order-book-db:
+
+networks:
+  order-book-network:
+    driver: bridge

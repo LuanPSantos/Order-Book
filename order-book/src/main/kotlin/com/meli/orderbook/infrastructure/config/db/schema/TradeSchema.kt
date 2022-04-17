@@ -18,6 +18,6 @@ class TradeSchema(
     val type: Order.Type? = null,
     val size: Int? = null,
     val price: BigDecimal? = null,
-    val change: BigDecimal? = null,
+    val changeMoney: BigDecimal? = null,
     val creationDate: LocalDateTime? = null
 )
