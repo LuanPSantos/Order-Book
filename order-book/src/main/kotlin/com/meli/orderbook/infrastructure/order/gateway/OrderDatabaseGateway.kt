@@ -79,4 +79,19 @@ class OrderDatabaseGateway(
             schema.id
         )
     }
+
+    override fun findAllOrdersInTradeByWallet(walletId: Long): List<Order> {
+        return orderRepository.findAllOrdersInTradeByWallet(walletId)
+            .map {
+                Order(
+                    it.walletId!!,
+                    it.type!!,
+                    it.price!!,
+                    it.size!!,
+                    it.creationDate!!,
+                    it.state!!,
+                    it.id
+                )
+            }
+    }
 }
