@@ -22,7 +22,7 @@ import org.junit.jupiter.api.assertThrows
 import java.math.BigDecimal
 import java.time.LocalDateTime.now
 
-class CancelSellOrderUseCaseTest {
+class CancelBuyOrderUseCaseTest {
 
     private val dateTime = now()
 
@@ -39,7 +39,7 @@ class CancelSellOrderUseCaseTest {
     lateinit var walletCommandGateway: WalletCommandGateway
 
     @InjectMockKs
-    lateinit var cancelSellOrderUseCase: CancelSellOrderUseCase
+    lateinit var cancelBuyOrderUseCase: CancelBuyOrderUseCase
 
     @BeforeEach
     fun setUp() = MockKAnnotations.init(this)
@@ -47,7 +47,7 @@ class CancelSellOrderUseCaseTest {
     @Test
     fun `Should cancel a order`() {
 
-        val inTradeOrder = Order(1, SELL, BigDecimal("10"), 10, dateTime, IN_TRADE, 1)
+        val inTradeOrder = Order(1, BUY, BigDecimal("10"), 10, dateTime, IN_TRADE, 1)
 
         val orderSlot = slot<Order>()
         val walletSlot = slot<Wallet>()
@@ -57,7 +57,7 @@ class CancelSellOrderUseCaseTest {
         every { orderCommandGateway.update(capture(orderSlot)) } just Runs
         every { walletCommandGateway.update(capture(walletSlot)) } just Runs
 
-        cancelSellOrderUseCase.execute(Input(1))
+        cancelBuyOrderUseCase.execute(Input(1))
 
         verify(exactly = 1) { orderQueryGateway.findById(1) }
         verify(exactly = 1) { orderCommandGateway.update(any()) }
@@ -66,22 +66,22 @@ class CancelSellOrderUseCaseTest {
         assertEquals(dateTime, orderSlot.captured.creationDate)
         assertEquals(1, orderSlot.captured.walletId)
         assertEquals(BigDecimal("10"), orderSlot.captured.price)
-        assertEquals(SELL, orderSlot.captured.type)
+        assertEquals(BUY, orderSlot.captured.type)
         assertEquals(1, orderSlot.captured.id)
 
         assertEquals(1, walletSlot.captured.id)
-        assertEquals(20, walletSlot.captured.amountOfVibranium)
-        assertEquals(BigDecimal("10"), walletSlot.captured.amountOfMoney)
+        assertEquals(10, walletSlot.captured.amountOfVibranium)
+        assertEquals(BigDecimal("110"), walletSlot.captured.amountOfMoney)
     }
 
     @Test
-    fun `Should not cancel a buy-order`() {
-        val inTradeOrder = Order(1, BUY, BigDecimal("10"), 10, dateTime, IN_TRADE, 1)
+    fun `Should not cancel a sell-order`() {
+        val inTradeOrder = Order(1, SELL, BigDecimal("10"), 10, dateTime, IN_TRADE, 1)
 
         every { orderQueryGateway.findById(eq(1)) } returns inTradeOrder
 
-        val exception = assertThrows<InvalidOrderType> { cancelSellOrderUseCase.execute(Input(1)) }
+        val exception = assertThrows<InvalidOrderType> { cancelBuyOrderUseCase.execute(Input(1)) }
 
-        assertEquals("Not a sell order", exception.message)
+        assertEquals("Not a buy order", exception.message)
     }
 }

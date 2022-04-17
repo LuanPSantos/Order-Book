@@ -48,7 +48,7 @@ class TradeServiceTest {
     fun setUp() = MockKAnnotations.init(this)
 
     @Test
-    fun `Should not execute a trande when sell price is greater than buy price`() {
+    fun `Should not execute the trade`() {
 
         tradeService.execute(
             Order(2, BUY, BigDecimal("10"), 10, dateTime, IN_TRADE),
@@ -127,8 +127,11 @@ class TradeServiceTest {
         assertNull(tradeSlot.captured.id)
         assertEquals(expectedTrade.size, tradeSlot.captured.size)
         assertEquals(expectedTrade.price, tradeSlot.captured.price)
+        assertEquals(expectedTrade.change, tradeSlot.captured.change)
         assertEquals(expectedTrade.sellOrderId, tradeSlot.captured.sellOrderId)
         assertEquals(expectedTrade.buyerOrderId, tradeSlot.captured.buyerOrderId)
+        assertEquals(expectedTrade.sellerWalletId, tradeSlot.captured.sellerWalletId)
+        assertEquals(expectedTrade.buyerWalletId, tradeSlot.captured.buyerWalletId)
         assertEquals(expectedTrade.type, tradeSlot.captured.type)
         assertNotNull(tradeSlot.captured.creationDate)
     }
@@ -139,16 +142,17 @@ class TradeServiceTest {
         @JvmStatic
         fun testScenarios(): Stream<Arguments> {
             return Stream.of(
-                pricesMatchedAndSizeMetched(),
-                pricesMatchedAndMoreSellThanBuy(),
-                pricesMatchedAndLessSellThanBuy(),
-                sizeMatchedAndSellCheaper(),
-                moreSellThanBuyAndSellCheaper(),
-                lessSellThanBuyAndSellCheaper()
+                `sell-trade where price matches and size metches`(),
+                `sell-trade where price matches and sell-size is greater than buy-size`(),
+                `sell-trade where price matches and sell-size is less than buy-size`(),
+                `sell-trade where sell-price is cheaper than buy-price and size are equal`(),
+                `sell-trade where sell-price is cheaper than buy-price and sell-size is greater than buy-size`(),
+                `sell-trade where sell-price is cheaper than buy-price and sell-size is less than buy-size`(),
+                `buy-trade where price matches and size metches`()
             )
         }
 
-        private fun pricesMatchedAndSizeMetched(): Arguments {
+        private fun `sell-trade where price matches and size metches`(): Arguments {
             return arguments(
                 Wallet(1, BigDecimal("10"), 10),
                 Wallet(2, BigDecimal("10"), 10),
@@ -162,7 +166,7 @@ class TradeServiceTest {
             )
         }
 
-        private fun pricesMatchedAndMoreSellThanBuy(): Arguments {
+        private fun `sell-trade where price matches and sell-size is greater than buy-size`(): Arguments {
             return arguments(
                 Wallet(1, BigDecimal("10"), 10),
                 Wallet(2, BigDecimal("10"), 10),
@@ -176,7 +180,7 @@ class TradeServiceTest {
             )
         }
 
-        private fun pricesMatchedAndLessSellThanBuy(): Arguments {
+        private fun `sell-trade where price matches and sell-size is less than buy-size`(): Arguments {
             return arguments(
                 Wallet(1, BigDecimal("10"), 10),
                 Wallet(2, BigDecimal("10"), 10),
@@ -190,7 +194,7 @@ class TradeServiceTest {
             )
         }
 
-        private fun sizeMatchedAndSellCheaper(): Arguments {
+        private fun `sell-trade where sell-price is cheaper than buy-price and size are equal`(): Arguments {
             return arguments(
                 Wallet(1, BigDecimal("10"), 10),
                 Wallet(2, BigDecimal("10"), 10),
@@ -204,7 +208,7 @@ class TradeServiceTest {
             )
         }
 
-        private fun moreSellThanBuyAndSellCheaper(): Arguments {
+        private fun `sell-trade where sell-price is cheaper than buy-price and sell-size is greater than buy-size`(): Arguments {
             return arguments(
                 Wallet(1, BigDecimal("10"), 10),
                 Wallet(2, BigDecimal("10"), 10),
@@ -218,7 +222,7 @@ class TradeServiceTest {
             )
         }
 
-        private fun lessSellThanBuyAndSellCheaper(): Arguments {
+        private fun `sell-trade where sell-price is cheaper than buy-price and sell-size is less than buy-size`(): Arguments {
             return arguments(
                 Wallet(1, BigDecimal("10"), 10),
                 Wallet(2, BigDecimal("10"), 10),
@@ -228,8 +232,23 @@ class TradeServiceTest {
                 Wallet(2, BigDecimal("20"), 20),
                 Order(1, SELL, BigDecimal("9"), 0, dateTime, CLOSED, 1),
                 Order(2, BUY, BigDecimal("10"), 5, dateTime, IN_TRADE, 2),
-                Trade(1, 2, 1, 1, SELL, 10, BigDecimal("9"), BigDecimal("1"), dateTime)
+                Trade(1, 2, 1, 2, SELL, 10, BigDecimal("9"), BigDecimal("1"), dateTime)
             )
         }
+
+        private fun `buy-trade where price matches and size metches`(): Arguments {
+            return arguments(
+                Wallet(2, BigDecimal("10"), 10),
+                Wallet(1, BigDecimal("10"), 10),
+                Order(2, BUY, BigDecimal("10"), 10, dateTime, IN_TRADE, 2),
+                Order(1, SELL, BigDecimal("10"), 10, dateTime, IN_TRADE, 1),
+                Wallet(2, BigDecimal("10"), 20),
+                Wallet(1, BigDecimal("110"), 10),
+                Order(2, BUY, BigDecimal("10"), 0, dateTime, CLOSED, 2),
+                Order(1, SELL, BigDecimal("10"), 0, dateTime, CLOSED, 1),
+                Trade(1, 2, 1, 2, BUY, 10, BigDecimal("10"), BigDecimal("0"), dateTime)
+            )
+        }
+
     }
 }

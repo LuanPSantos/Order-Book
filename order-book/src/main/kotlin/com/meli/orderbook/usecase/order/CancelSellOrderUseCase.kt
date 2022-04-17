@@ -1,8 +1,10 @@
 package com.meli.orderbook.usecase.order
 
+import com.meli.orderbook.entity.order.exception.InvalidOrderType
 import com.meli.orderbook.entity.order.gateway.OrderCommandGateway
 import com.meli.orderbook.entity.order.gateway.OrderQueryGateway
 import com.meli.orderbook.entity.order.model.Order
+import com.meli.orderbook.entity.order.model.Order.Type.SELL
 import com.meli.orderbook.entity.wallet.gateway.WalletCommandGateway
 import com.meli.orderbook.entity.wallet.gateway.WalletQueryGateway
 import com.meli.orderbook.entity.wallet.model.Wallet
@@ -17,8 +19,8 @@ class CancelSellOrderUseCase(
 ) : CancelOrderUseCase(orderQueryGateway, orderCommandGateway, walletQueryGateway, walletCommandGateway) {
 
     override fun validateOrder(order: Order) {
-        if (order.type != Order.Type.SELL) {
-            throw IllegalStateException("Not a sell order")
+        if (order.type != SELL) {
+            throw InvalidOrderType("Not a sell order")
         }
     }
 

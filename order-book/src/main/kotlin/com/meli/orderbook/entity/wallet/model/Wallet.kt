@@ -1,5 +1,6 @@
 package com.meli.orderbook.entity.wallet.model
 
+import com.meli.orderbook.entity.wallet.exception.WalletOperationException
 import java.math.BigDecimal
 
 class Wallet(
@@ -15,7 +16,7 @@ class Wallet(
 
     fun subtractVibranium(size: Int) {
         if (size > amountOfVibranium || size <= 0) {
-            throw IllegalArgumentException("Invalid size to subtract")
+            throw WalletOperationException("Cant subtract $size from $amountOfVibranium vibranium in wallet")
         }
 
         this.amountOfVibranium -= size
@@ -23,7 +24,7 @@ class Wallet(
 
     fun depositVibranium(size: Int) {
         if (size < 0) {
-            throw IllegalArgumentException("Invalid size to deposit")
+            throw WalletOperationException("Cant deposit $size vibranium in wallet")
         }
 
         this.amountOfVibranium += size
@@ -31,14 +32,14 @@ class Wallet(
 
     fun depositMoney(deposit: BigDecimal) {
         if (deposit < BigDecimal.ZERO) {
-            throw IllegalArgumentException("Invalid value to deposit")
+            throw WalletOperationException("Cant deposit $deposit in wallet")
         }
         this.amountOfMoney += deposit
     }
 
     fun subtractMoney(subtract: BigDecimal) {
         if (subtract < BigDecimal.ZERO || subtract > this.amountOfMoney) {
-            throw IllegalArgumentException("Invalid value to subtract")
+            throw WalletOperationException("Cant subtract $subtract (reais) from $amountOfMoney (reais) in wallet")
         }
 
 

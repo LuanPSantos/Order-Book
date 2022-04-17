@@ -6,6 +6,7 @@ import com.meli.orderbook.entity.order.model.Order.Type.BUY
 import com.meli.orderbook.entity.order.model.Order.Type.SELL
 import com.meli.orderbook.entity.wallet.gateway.WalletQueryGateway
 import com.meli.orderbook.entity.wallet.model.Wallet
+import com.meli.orderbook.usecase.wallet.GetWalletUseCase.Output.InTrade
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
 
@@ -33,7 +34,7 @@ class GetWalletUseCase(
             .map { it.size }
             .forEach { totalSizeInTrade += it }
 
-        return Output(wallet, totalMoneyInTrade, totalSizeInTrade)
+        return Output(wallet, InTrade(totalMoneyInTrade, totalSizeInTrade))
     }
 
     data class Input(
@@ -42,7 +43,11 @@ class GetWalletUseCase(
 
     data class Output(
         val wallet: Wallet,
-        val totalMoneyInTrade: BigDecimal,
-        val totalSizeInTrade: Int
-    )
+        val inTrade: InTrade
+    ) {
+        data class InTrade(
+            val amountOfMoney: BigDecimal,
+            val amountOfVibranium: Int
+        )
+    }
 }

@@ -95,8 +95,8 @@ class OrderTest {
     }
 
     @Test
-    fun `Should not let sell-order trade with an buy-order that is closed`() {
-        val sellOrder = Order(1, SELL, BigDecimal.TEN, 10, dateTime)
+    fun `Should not let sell-order trade with an buy-order that is not in-trade`() {
+        val sellOrder = Order(1, SELL, BigDecimal.TEN, 10, dateTime, IN_TRADE)
         val buyOrder = Order(2, BUY, BigDecimal.ONE, 10, dateTime)
 
         buyOrder.close().subtractAllSize()
@@ -106,14 +106,52 @@ class OrderTest {
     }
 
     @Test
-    fun `Should not let sell-order trade with an buy-order that is cancelled`() {
+    fun `Should not let sell-order that is not in-trade trade with an buy-order`() {
         val sellOrder = Order(1, SELL, BigDecimal.TEN, 10, dateTime)
-        val buyOrder = Order(2, BUY, BigDecimal.ONE, 10, dateTime)
+        val buyOrder = Order(2, BUY, BigDecimal.ONE, 10, dateTime, IN_TRADE)
 
-        buyOrder.cancel().subtractAllSize()
+        sellOrder.cancel().subtractAllSize()
+
+        assertFalse(sellOrder.canTradeWith(buyOrder))
+        assertEquals(0, sellOrder.size)
+    }
+
+    @Test
+    fun `Should not let buy-order trade with an sell-order which size is zero`() {
+        val sellOrder = Order(1, SELL, BigDecimal.TEN, 0, dateTime)
+        val buyOrder = Order(2, BUY, BigDecimal.TEN, 10, dateTime)
+
+        assertFalse(sellOrder.canTradeWith(buyOrder))
+    }
+
+    @Test
+    fun `Should not let buy-order trade with a more expensive sell-order`() {
+        val sellOrder = Order(1, SELL, BigDecimal.ONE, 10, dateTime)
+        val buyOrder = Order(2, BUY, BigDecimal.TEN, 10, dateTime)
+
+        assertFalse(sellOrder.canTradeWith(buyOrder))
+    }
+
+    @Test
+    fun `Should not let buy-order trade with an sell-order that is not in-trade`() {
+        val sellOrder = Order(1, SELL, BigDecimal.TEN, 10, dateTime)
+        val buyOrder = Order(2, BUY, BigDecimal.ONE, 10, dateTime, IN_TRADE)
+
+        buyOrder.close().subtractAllSize()
 
         assertFalse(sellOrder.canTradeWith(buyOrder))
         assertEquals(0, buyOrder.size)
+    }
+
+    @Test
+    fun `Should not let buy-order that is not in-trade trade with an sell-order`() {
+        val sellOrder = Order(1, SELL, BigDecimal.TEN, 10, dateTime, IN_TRADE)
+        val buyOrder = Order(2, BUY, BigDecimal.ONE, 10, dateTime)
+
+        sellOrder.cancel().subtractAllSize()
+
+        assertFalse(sellOrder.canTradeWith(buyOrder))
+        assertEquals(0, sellOrder.size)
     }
 
     @Test

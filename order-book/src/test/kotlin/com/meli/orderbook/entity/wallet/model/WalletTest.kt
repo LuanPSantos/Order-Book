@@ -1,5 +1,6 @@
-package com.meli.orderbook.entity.wallet
+package com.meli.orderbook.entity.wallet.model
 
+import com.meli.orderbook.entity.wallet.exception.WalletOperationException
 import com.meli.orderbook.entity.wallet.model.Wallet
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -13,11 +14,11 @@ class WalletTest {
     fun `Should not subtract a negative size`() {
         val wallet = Wallet(1, BigDecimal.TEN, 5)
 
-        val exception = assertThrows<IllegalArgumentException> {
+        val exception = assertThrows<WalletOperationException> {
             wallet.subtractVibranium(-1)
         }
 
-        assertEquals("Invalid size to subtract", exception.message)
+        assertEquals("Cant subtract -1 from 5 vibranium in wallet", exception.message)
 
         assertEquals(5, wallet.amountOfVibranium)
         assertEquals(1, wallet.id)
@@ -28,11 +29,11 @@ class WalletTest {
     fun `Should not subtract when size is greater than the amount in the wallet`() {
         val wallet = Wallet(1, BigDecimal.TEN, 5)
 
-        val exception = assertThrows<IllegalArgumentException> {
+        val exception = assertThrows<WalletOperationException> {
             wallet.subtractVibranium(15)
         }
 
-        assertEquals("Invalid size to subtract", exception.message)
+        assertEquals("Cant subtract 15 from 5 vibranium in wallet", exception.message)
 
         assertEquals(5, wallet.amountOfVibranium)
         assertEquals(1, wallet.id)
@@ -43,11 +44,11 @@ class WalletTest {
     fun `Should not deposit when size is lass than zero`() {
         val wallet = Wallet(1, BigDecimal.TEN, 5)
 
-        val exception = assertThrows<IllegalArgumentException> {
+        val exception = assertThrows<WalletOperationException> {
             wallet.depositVibranium(-1)
         }
 
-        assertEquals("Invalid size to deposit", exception.message)
+        assertEquals("Cant deposit -1 vibranium in wallet", exception.message)
 
         assertEquals(5, wallet.amountOfVibranium)
         assertEquals(1, wallet.id)
@@ -91,13 +92,54 @@ class WalletTest {
     fun `Should not deposit a nagative amount of money`() {
         val wallet = Wallet(1, BigDecimal.TEN, 5)
 
-        val exception = assertThrows<IllegalArgumentException> {
+        val exception = assertThrows<WalletOperationException> {
             wallet.depositMoney(BigDecimal.TEN.negate())
         }
 
-        assertEquals("Invalid deposit value", exception.message)
+        assertEquals("Cant deposit -10 in wallet", exception.message)
 
         assertEquals(BigDecimal("10"), wallet.amountOfMoney)
+        assertEquals(1, wallet.id)
+        assertEquals(5, wallet.amountOfVibranium)
+    }
+
+    @Test
+    fun `Should not subtract a nagative amount of money`() {
+        val wallet = Wallet(1, BigDecimal.TEN, 5)
+
+        val exception = assertThrows<WalletOperationException> {
+            wallet.subtractMoney(BigDecimal.TEN.negate())
+        }
+
+        assertEquals("Cant subtract -10 (reais) from 10 (reais) in wallet", exception.message)
+
+        assertEquals(BigDecimal("10"), wallet.amountOfMoney)
+        assertEquals(1, wallet.id)
+        assertEquals(5, wallet.amountOfVibranium)
+    }
+
+    @Test
+    fun `Should not subtract when the amount subtracting is greater than the wallet`() {
+        val wallet = Wallet(1, BigDecimal.ONE, 5)
+
+        val exception = assertThrows<WalletOperationException> {
+            wallet.subtractMoney(BigDecimal.TEN)
+        }
+
+        assertEquals("Cant subtract 10 (reais) from 1 (reais) in wallet", exception.message)
+
+        assertEquals(BigDecimal.ONE, wallet.amountOfMoney)
+        assertEquals(1, wallet.id)
+        assertEquals(5, wallet.amountOfVibranium)
+    }
+
+    @Test
+    fun `Should subtract money from wallet`() {
+        val wallet = Wallet(1, BigDecimal.TEN, 5)
+
+        wallet.subtractMoney(BigDecimal.ONE)
+
+        assertEquals(BigDecimal("9"), wallet.amountOfMoney)
         assertEquals(1, wallet.id)
         assertEquals(5, wallet.amountOfVibranium)
     }
