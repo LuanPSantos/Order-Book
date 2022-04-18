@@ -54,14 +54,14 @@ Valores atuais na carteira e valores atuais em trade pertencentes a carteira (qu
 ---
 ### Place a Sell Order (Realizar uma oferta de venda)
 **Input**:  
-Quantiade à venda e valor pedido por cada unidade de vibranium
+Quantiade à venda, o valor pedido por cada unidade de vibranium e o ID da carteira
 
 **Output**:  
 None
 ---
 ### Place a Buy Order (Realizar uma oferta de compra)
 **Input**:  
-Quantiade que se quer comprar e o valor máximo desejada que se pagar por cada unidade de vibranium
+Quantiade que se quer comprar, o valor máximo desejada que se pagar por cada unidade de vibranium e o ID da carteira
 
 **Output**:  
 None
