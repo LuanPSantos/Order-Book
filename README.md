@@ -30,7 +30,7 @@ docker-compose up -d --build
 
 [Order-Book-Postman-Collection](https://github.com/LuanPSantos/Meli-Order-Book/blob/main/postman/Order%20Book.postman_collection.json)
 
-## Casos de Uso
+## Casos de Uso (MVP)
 
 ### Get Order Book (Buscar livro de ofertas)
 **Input**:  
@@ -81,4 +81,29 @@ ID da oferta
 **Output**:  
 None
 
-## Arquitetura
+## Arquitetura (Solução final)
+
+![Arquitetura do Order Book](imgs/Aquitetura-Order-Book.png)
+
+**Order Placer** e **Trader** são microserviços orquestradores. Caso ocorra alguma falha, eles serão responsáveis por realizar os devidos _rollbacks_
+
+### Fluxo feliz
+**1** - O Frontend realiza uma request para criar uma nova Orfeta (venda/compra)  
+
+**2.1** - O valor (vibranium/dinheiro) é subtraído da Carteira do usuário  
+**2.2** - Uma nova Oferta é criada com o valor subtraído da Carteira  
+
+**3** - A nova Oferta é enviada para uma fila para ser processada
+
+**4** - A nova Oferta é consumida pelo serviço que vai processar a Trade
+
+**5.1.x** - O Livro de Ofertas é carregado por completo e a coleção é trancado (Lock pessimista)  
+**5.2.x** - A Oferta fechada é atualizada  
+**5.3.x** - O valor da transação é depositado na Carteria  
+**5.4.x** - O evento de transação completada com sucesso é emitodo  
+**5.5.x** - O Livro de Ofertas é atualizado por completo e a coleção é destrancada  
+_**X** é o número de _matches_ que ocorreram entre a nova Oferta e as Ofertas que existiam no Book - uma Transação para cada venda/compra_
+
+**6** - O evento de transação completada com sucesso é consumido por um WebSocket Server   
+**7** - Os estado atual da Carteira é carregado  
+**8** - E enviado para o Frontend  
