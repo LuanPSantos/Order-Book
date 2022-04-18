@@ -44,6 +44,7 @@ None
 
 **Output**:  
 Bids e Asks que estão em trade no momento da consulta
+
 ---
 ### Get Wallet By ID (Buscar carteira pelo ID)
 **Input**:  
@@ -51,6 +52,7 @@ ID da Carteira
 
 **Output**:  
 Valores atuais na carteira e valores atuais em trade pertencentes a carteira (quantiade de dinheiro e quantiade de vibranium)
+
 ---
 ### Place a Sell Order (Realizar uma oferta de venda)
 **Input**:  
@@ -58,6 +60,7 @@ Quantiade à venda, o valor pedido por cada unidade de vibranium e o ID da carte
 
 **Output**:  
 None
+
 ---
 ### Place a Buy Order (Realizar uma oferta de compra)
 **Input**:  
@@ -65,6 +68,7 @@ Quantiade que se quer comprar, o valor máximo desejada que se pagar por cada un
 
 **Output**:  
 None
+
 ---
 ### Get Trade History (Buscar hsitórico de transações)
 **Input**:  
@@ -72,6 +76,7 @@ número da página e tamanho da página
 
 **Output**:  
 Lista com as trasações realizadas
+
 ---
 ### Cancel a Sell Order (Cancelar uma orfeta de venda)
 **Input**:  
@@ -79,6 +84,7 @@ ID da oferta
 
 **Output**:  
 None
+
 ---
 ### Cancel a Buy Order (Cancelar uma orfeta de compra)
 **Input**:  
