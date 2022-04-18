@@ -14,7 +14,7 @@ Quando um ofeta de compra encontra uma ofeta de venda compatível (ou vice-versa
 git clone https://github.com/LuanPSantos/Meli-Order-Book.git
 ``
 
-**2 - Entre no diretório "/order-book"** 
+**2 - Navegue até o diretório raíz do projeto** 
 
 ``
 cd Meli-Order-Book/order-book
