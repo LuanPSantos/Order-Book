@@ -38,45 +38,47 @@ None
 
 **Output**:  
 Bids e Asks que estão em trade no momento da consulta
-
+---
 ### Get Wallet By ID (Buscar carteira pelo ID)
 **Input**:  
 ID da Carteira
 
 **Output**:  
-Valores atuais na carteira e valores atuais em trade pertencentes a carteira (quantiade em dinheiro e quantiade de vibranium)
-
+Valores atuais na carteira e valores atuais em trade pertencentes a carteira (quantiade de dinheiro e quantiade de vibranium)
+---
 ### Place a Sell Order (Realizar uma oferta de venda)
 **Input**:  
 Quantiade à venda e valor pedido por cada unidade de vibranium
 
 **Output**:  
 None
-
+---
 ### Place a Buy Order (Realizar uma oferta de compra)
 **Input**:  
 Quantiade que se quer comprar e o valor máximo desejada que se pagar por cada unidade de vibranium
 
 **Output**:  
 None
-
+---
 ### Get Trade History (Buscar hsitórico de transações)
 **Input**:  
 número da página e tamanho da página
 
 **Output**:  
 Lista com as trasações realizadas
-
+---
 ### Cancel a Sell Order (Cancelar uma orfeta de venda)
 **Input**:  
 ID da oferta
 
 **Output**:  
 None
-
+---
 ### Cancel a Buy Order (Cancelar uma orfeta de compra)
 **Input**:  
 ID da oferta
 
 **Output**:  
 None
+
+## Arquitetura
