@@ -3,7 +3,7 @@
 Em um Order Book ou Livro de ofertas contém as ofertas de compra e venda para um determinado ativo (Vibranium).
 Ao realizar uma oferta de venda, a quantidade ofertada é subtraída da carteira e entra em trade com valor requerido pelo vendedor.
 Ao realizar uma oferta de compra, o total em dinheiro (tamanho da oferta x preço desejado de compra) é subtraído da carteira e entra em trade.
-Quando um ofeta de compra encontra uma ofeta de venda compatível (ou vice-versa), ocorre uma transação e os valores correpondetes são depositados nas carteiras envolvidas:
+Quando um ofeta de compra encontra uma ofeta de venda compatível (ou vice-versa), ocorre uma transação e os valores correpondentes são depositados nas carteiras envolvidas:
 é adicionado a quantiade de vibranium na carteira do comprador; é adicionado o valor total da transação na carteira do vendedor. Também são salvos os dados com detalhes sobre a transação.
 
 ## Rodando a aplicação
@@ -29,6 +29,12 @@ docker-compose up -d --build
 **4 - Importe a seguinte Postman Collection:**  
 
 [Order-Book-Postman-Collection](https://github.com/LuanPSantos/Meli-Order-Book/blob/main/postman/Order%20Book.postman_collection.json)
+
+**5 - Utilize os seguintes Wallet-IDs para realizar as operações**
+- walletId: 1  
+- walletId: 2  
+- walletId: 3  
+- walletId: 4  
 
 ## Casos de Uso (MVP)
 
