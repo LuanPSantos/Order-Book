@@ -54,7 +54,7 @@ ID da Carteira
 Valores atuais na carteira e valores atuais em trade pertencentes a carteira (quantiade de dinheiro e quantiade de vibranium)
 
 ---
-### Place a Sell Order (Realizar uma oferta de venda)
+### Place a Sale Order (Realizar uma oferta de venda)
 **Input**:  
 Quantiade à venda, o valor pedido por cada unidade de vibranium e o ID da carteira
 
@@ -62,7 +62,7 @@ Quantiade à venda, o valor pedido por cada unidade de vibranium e o ID da carte
 None
 
 ---
-### Place a Buy Order (Realizar uma oferta de compra)
+### Place a Purchase Order (Realizar uma oferta de compra)
 **Input**:  
 Quantiade que se quer comprar, o valor máximo desejada que se pagar por cada unidade de vibranium e o ID da carteira
 
@@ -78,7 +78,7 @@ número da página e tamanho da página
 Lista com as trasações realizadas
 
 ---
-### Cancel a Sell Order (Cancelar uma orfeta de venda)
+### Cancel a Sale Order (Cancelar uma orfeta de venda)
 **Input**:  
 ID da oferta
 
@@ -86,7 +86,7 @@ ID da oferta
 None
 
 ---
-### Cancel a Buy Order (Cancelar uma orfeta de compra)
+### Cancel a Purchase Order (Cancelar uma orfeta de compra)
 **Input**:  
 ID da oferta
 
