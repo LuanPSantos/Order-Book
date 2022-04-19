@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
 @Service
-class CreateSellOrderService(
+class CreateSaleOrderService(
     walletQueryGateway: WalletQueryGateway,
     walletCommandGateway: WalletCommandGateway,
     orderCommandGateway: OrderCommandGateway,

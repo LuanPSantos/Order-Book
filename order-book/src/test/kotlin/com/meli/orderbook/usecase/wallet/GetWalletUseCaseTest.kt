@@ -2,7 +2,9 @@ package com.meli.orderbook.usecase.wallet
 
 import com.meli.orderbook.entity.order.gateway.OrderQueryGateway
 import com.meli.orderbook.entity.order.model.Order
-import com.meli.orderbook.entity.order.model.Order.State.IN_TRADE
+import com.meli.orderbook.entity.order.model.Order.State.TRADING
+import com.meli.orderbook.entity.order.model.Order.Type.PURCHASE
+import com.meli.orderbook.entity.order.model.Order.Type.SALE
 import com.meli.orderbook.entity.wallet.gateway.WalletQueryGateway
 import com.meli.orderbook.entity.wallet.model.Wallet
 import com.meli.orderbook.usecase.wallet.GetWalletUseCase.Input
@@ -33,11 +35,11 @@ class GetWalletUseCaseTest {
     fun setUp() = MockKAnnotations.init(this)
 
     @Test
-    fun `Should get the wallet that has a sell-order in trade`() {
-        every { walletQueryGateway.findById(eq(1)) } returns Wallet(1, BigDecimal("10"), 10)
+    fun `Should get the wallet that has a sale-order in trade`() {
+        every { walletQueryGateway.findById(eq(1)) } returns Wallet(id = 1, amountOfMoney = BigDecimal("10"), amountOfVibranium = 10)
         every {
-            orderQueryGateway.findAllOrdersInTradeByWallet(eq(1))
-        } returns listOf(Order(1, Order.Type.SELL, BigDecimal("10"), 1, dateTime, IN_TRADE))
+            orderQueryGateway.findAllOrdersInTradeByWalletId(eq(1))
+        } returns listOf(Order(walletId = 1, type = SALE, price = BigDecimal("10"), size = 1, creationDate = dateTime, state = TRADING))
 
         val output = getWalletUseCase.execute(Input(1))
 
@@ -49,13 +51,13 @@ class GetWalletUseCaseTest {
     }
 
     @Test
-    fun `Should get the wallet that has a buy-order in trade`() {
-        every { walletQueryGateway.findById(eq(1)) } returns Wallet(1, BigDecimal("10"), 10)
+    fun `Should get the wallet that has a purchase-order in trade`() {
+        every { walletQueryGateway.findById(eq(1)) } returns Wallet(id = 1, amountOfMoney = BigDecimal("10"), amountOfVibranium = 10)
         every {
-            orderQueryGateway.findAllOrdersInTradeByWallet(eq(1))
-        } returns listOf(Order(1, Order.Type.BUY, BigDecimal("10"), 1, dateTime, IN_TRADE))
+            orderQueryGateway.findAllOrdersInTradeByWalletId(eq(1))
+        } returns listOf(Order(walletId = 1, type = PURCHASE, price = BigDecimal("10"), size = 1, creationDate = dateTime, state = TRADING))
 
-        val output = getWalletUseCase.execute(Input(1))
+        val output = getWalletUseCase.execute(Input(walletId = 1))
 
         assertEquals(1, output.wallet.id)
         assertEquals(BigDecimal("10"), output.wallet.amountOfMoney)
@@ -66,9 +68,9 @@ class GetWalletUseCaseTest {
 
     @Test
     fun `Should get the wallet that has nothing in trade`() {
-        every { walletQueryGateway.findById(eq(1)) } returns Wallet(1, BigDecimal("10"), 10)
+        every { walletQueryGateway.findById(eq(1)) } returns Wallet(id = 1, amountOfMoney = BigDecimal("10"), amountOfVibranium = 10)
         every {
-            orderQueryGateway.findAllOrdersInTradeByWallet(eq(1))
+            orderQueryGateway.findAllOrdersInTradeByWalletId(eq(1))
         } returns listOf()
 
         val output = getWalletUseCase.execute(Input(1))

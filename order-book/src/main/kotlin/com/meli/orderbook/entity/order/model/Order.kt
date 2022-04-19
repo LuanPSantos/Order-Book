@@ -1,17 +1,18 @@
 package com.meli.orderbook.entity.order.model
 
+import com.meli.orderbook.entity.order.model.Order.State.TRADING
 import org.slf4j.LoggerFactory
 import java.math.BigDecimal
 import java.time.LocalDateTime
 
 open class Order(
+    val id: Long? = null,
     val walletId: Long,
     val type: Type,
     val price: BigDecimal,
     size: Int,
     val creationDate: LocalDateTime = LocalDateTime.now(),
     state: State = State.CREATING,
-    val id: Long? = null
 ) {
 
     private val log = LoggerFactory.getLogger(this::class.java)
@@ -39,7 +40,7 @@ open class Order(
     }
 
     fun enableToTrade() {
-        this.state = State.IN_TRADE
+        this.state = TRADING
     }
 
     fun subtractAllSize(): Int {
@@ -67,8 +68,8 @@ open class Order(
     fun canTradeWith(otherOrder: Order): Boolean {
         log.info("m=canTradeWith, otherOrderId=${otherOrder.id}, orderId=${this.id}")
         return when (type) {
-            Type.BUY -> otherOrder.size > 0 && otherOrder.price <= this.price && this.state == State.IN_TRADE && otherOrder.state == State.IN_TRADE
-            Type.SELL -> otherOrder.size > 0 && otherOrder.price >= this.price && this.state == State.IN_TRADE && otherOrder.state == State.IN_TRADE
+            Type.PURCHASE -> otherOrder.size > 0 && otherOrder.price <= this.price && this.state == TRADING && otherOrder.state == TRADING
+            Type.SALE -> otherOrder.size > 0 && otherOrder.price >= this.price && this.state == TRADING && otherOrder.state == TRADING
         }
     }
 
@@ -77,10 +78,10 @@ open class Order(
     }
 
     enum class Type {
-        SELL, BUY
+        SALE, PURCHASE
     }
 
     enum class State {
-        CREATING, IN_TRADE, CANCELLED, CLOSED
+        CREATING, TRADING, CANCELLED, CLOSED
     }
 }

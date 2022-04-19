@@ -5,5 +5,5 @@ import com.meli.orderbook.entity.order.model.Order
 interface OrderQueryGateway {
 
     fun findById(orderId: Long): Order
-    fun findAllOrdersInTradeByWallet(walletId: Long): List<Order>
+    fun findAllOrdersInTradeByWalletId(walletId: Long): List<Order>
 }

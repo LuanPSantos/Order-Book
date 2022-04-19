@@ -2,7 +2,7 @@ package com.meli.orderbook.infrastructure.config.db.repository
 
 import com.meli.orderbook.entity.order.model.Order
 import com.meli.orderbook.entity.order.model.Order.State
-import com.meli.orderbook.entity.order.model.Order.State.IN_TRADE
+import com.meli.orderbook.entity.order.model.Order.State.TRADING
 import com.meli.orderbook.infrastructure.config.db.schema.OrderSchema
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
@@ -27,6 +27,6 @@ interface OrderRepository : JpaRepository<OrderSchema, Long> {
                 "WHERE order.walletId = :walletId " +
                 "AND order.state = :state"
     )
-    fun findAllOrdersInTradeByWallet(walletId: Long, state: State = IN_TRADE): List<OrderSchema>
+    fun findAllOrdersInTradeByWallet(walletId: Long, state: State = TRADING): List<OrderSchema>
 
 }

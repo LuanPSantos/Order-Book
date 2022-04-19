@@ -12,7 +12,7 @@ class WalletTest {
 
     @Test
     fun `Should not subtract a negative size`() {
-        val wallet = Wallet(1, BigDecimal.TEN, 5)
+        val wallet = Wallet(id = 1, amountOfMoney = BigDecimal("10"), amountOfVibranium = 5)
 
         val exception = assertThrows<WalletOperationException> {
             wallet.subtractVibranium(-1)
@@ -27,7 +27,7 @@ class WalletTest {
 
     @Test
     fun `Should not subtract when size is greater than the amount in the wallet`() {
-        val wallet = Wallet(1, BigDecimal.TEN, 5)
+        val wallet = Wallet(id = 1, amountOfMoney = BigDecimal("10"), amountOfVibranium = 5)
 
         val exception = assertThrows<WalletOperationException> {
             wallet.subtractVibranium(15)
@@ -42,7 +42,7 @@ class WalletTest {
 
     @Test
     fun `Should not deposit when size is lass than zero`() {
-        val wallet = Wallet(1, BigDecimal.TEN, 5)
+        val wallet = Wallet(id = 1, amountOfMoney = BigDecimal("10"), amountOfVibranium = 5)
 
         val exception = assertThrows<WalletOperationException> {
             wallet.depositVibranium(-1)
@@ -57,7 +57,7 @@ class WalletTest {
 
     @Test
     fun `Should  deposit when size to wallet`() {
-        val wallet = Wallet(1, BigDecimal.TEN, 5)
+        val wallet = Wallet(id = 1, amountOfMoney = BigDecimal("10"), amountOfVibranium = 5)
 
         wallet.depositVibranium(5)
 
@@ -68,7 +68,7 @@ class WalletTest {
 
     @Test
     fun `Should subtract a valid size`() {
-        val wallet = Wallet(1, BigDecimal.TEN, 5)
+        val wallet = Wallet(id = 1, amountOfMoney = BigDecimal("10"), amountOfVibranium = 5)
 
         wallet.subtractVibranium(3)
 
@@ -79,7 +79,7 @@ class WalletTest {
 
     @Test
     fun `Should deposit more money to wallet`() {
-        val wallet = Wallet(1, BigDecimal.TEN, 5)
+        val wallet = Wallet(id = 1, amountOfMoney = BigDecimal("10"), amountOfVibranium = 5)
 
         wallet.depositMoney(BigDecimal.TEN)
 
@@ -90,7 +90,7 @@ class WalletTest {
 
     @Test
     fun `Should not deposit a nagative amount of money`() {
-        val wallet = Wallet(1, BigDecimal.TEN, 5)
+        val wallet = Wallet(id = 1, amountOfMoney = BigDecimal("10"), amountOfVibranium = 5)
 
         val exception = assertThrows<WalletOperationException> {
             wallet.depositMoney(BigDecimal.TEN.negate())
@@ -105,7 +105,7 @@ class WalletTest {
 
     @Test
     fun `Should not subtract a nagative amount of money`() {
-        val wallet = Wallet(1, BigDecimal.TEN, 5)
+        val wallet = Wallet(id = 1, amountOfMoney = BigDecimal("10"), amountOfVibranium = 5)
 
         val exception = assertThrows<WalletOperationException> {
             wallet.subtractMoney(BigDecimal.TEN.negate())
@@ -120,7 +120,7 @@ class WalletTest {
 
     @Test
     fun `Should not subtract when the amount subtracting is greater than the wallet`() {
-        val wallet = Wallet(1, BigDecimal.ONE, 5)
+        val wallet = Wallet(id = 1, amountOfMoney = BigDecimal.ONE, amountOfVibranium = 5)
 
         val exception = assertThrows<WalletOperationException> {
             wallet.subtractMoney(BigDecimal.TEN)
@@ -135,7 +135,7 @@ class WalletTest {
 
     @Test
     fun `Should subtract money from wallet`() {
-        val wallet = Wallet(1, BigDecimal.TEN, 5)
+        val wallet = Wallet(id = 1, amountOfMoney = BigDecimal("10"), amountOfVibranium = 5)
 
         wallet.subtractMoney(BigDecimal.ONE)
 

@@ -1,7 +1,7 @@
 package com.meli.orderbook.entity.order.model
 
-import com.meli.orderbook.entity.order.model.Order.Type.BUY
-import com.meli.orderbook.entity.order.model.Order.Type.SELL
+import com.meli.orderbook.entity.order.model.Order.Type.PURCHASE
+import com.meli.orderbook.entity.order.model.Order.Type.SALE
 import org.slf4j.LoggerFactory
 
 class OrderBook(
@@ -16,16 +16,16 @@ class OrderBook(
     fun findMatchingOrders(order: Order): List<Order> {
         log.info("m=findMatchingOrders, orderId=${order.id}")
         return when (order.type) {
-            BUY -> findMatchingSellOrders(order)
-            SELL -> findMatchingBuyOrders(order)
+            PURCHASE -> findMatchingSaleOrders(order)
+            SALE -> findMatchingPurchaseOrders(order)
         }
     }
 
-    private fun findMatchingSellOrders(order: Order): List<Order> {
+    private fun findMatchingSaleOrders(order: Order): List<Order> {
         return asks.filter { it.price <= order.price }
     }
 
-    private fun findMatchingBuyOrders(order: Order): List<Order> {
+    private fun findMatchingPurchaseOrders(order: Order): List<Order> {
         return bids.filter { it.price >= order.price }
     }
 }

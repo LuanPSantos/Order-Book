@@ -4,7 +4,7 @@ import com.meli.orderbook.entity.order.exception.InvalidOrderType
 import com.meli.orderbook.entity.order.gateway.OrderCommandGateway
 import com.meli.orderbook.entity.order.gateway.OrderQueryGateway
 import com.meli.orderbook.entity.order.model.Order
-import com.meli.orderbook.entity.order.model.Order.Type.BUY
+import com.meli.orderbook.entity.order.model.Order.Type.PURCHASE
 import com.meli.orderbook.entity.wallet.gateway.WalletCommandGateway
 import com.meli.orderbook.entity.wallet.gateway.WalletQueryGateway
 import com.meli.orderbook.entity.wallet.model.Wallet
@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
 @Service
-class CancelBuyOrderUseCase(
+class CancelPurchaseOrderUseCase(
     orderQueryGateway: OrderQueryGateway,
     orderCommandGateway: OrderCommandGateway,
     walletQueryGateway: WalletQueryGateway,
@@ -24,8 +24,8 @@ class CancelBuyOrderUseCase(
     override fun validateOrder(order: Order) {
         log.info("m=validateOrder, orderType=${order.type}")
 
-        if (order.type != BUY) {
-            throw InvalidOrderType("Not a buy order")
+        if (order.type != PURCHASE) {
+            throw InvalidOrderType("Not a PURCHASE order")
         }
     }
 

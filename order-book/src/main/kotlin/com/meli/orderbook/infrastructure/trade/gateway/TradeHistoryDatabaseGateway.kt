@@ -23,10 +23,10 @@ class TradeHistoryDatabaseGateway(
         tradeRepository.save(
             TradeSchema(
                 trade.id,
-                trade.sellOrderId,
-                trade.buyerOrderId,
-                trade.sellerWalletId,
-                trade.buyerWalletId,
+                trade.saleOrderId,
+                trade.purchaseOrderId,
+                trade.saleWalletId,
+                trade.purchaseWalletId,
                 trade.type,
                 trade.size,
                 trade.price,
@@ -41,16 +41,16 @@ class TradeHistoryDatabaseGateway(
 
         return tradeRepository.findAll(Pageable.ofSize(pageSize).withPage(pageNumber)).map {
             Trade(
-                it.sellOrderId!!,
-                it.buyerOrderId!!,
-                it.sellerWalletId!!,
-                it.buyerWalletId!!,
-                it.type!!,
-                it.size!!,
-                it.price!!,
-                it.changeMoney!!,
-                it.creationDate!!,
-                it.id
+                id = it.id,
+                saleOrderId = it.saleOrderId,
+                purchaseOrderId = it.purchaseOrderId,
+                saleWalletId = it.sellerWalletId,
+                purchaseWalletId = it.buyerWalletId,
+                type = it.type,
+                size = it.size,
+                price = it.price,
+                change = it.changeMoney,
+                creationDate = it.creationDate
             )
         }.toList()
     }

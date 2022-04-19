@@ -1,8 +1,8 @@
 package com.meli.orderbook.entity.order.model
 
-import com.meli.orderbook.entity.order.model.Order.State.IN_TRADE
-import com.meli.orderbook.entity.order.model.Order.Type.BUY
-import com.meli.orderbook.entity.order.model.Order.Type.SELL
+import com.meli.orderbook.entity.order.model.Order.State.TRADING
+import com.meli.orderbook.entity.order.model.Order.Type.PURCHASE
+import com.meli.orderbook.entity.order.model.Order.Type.SALE
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
@@ -13,7 +13,7 @@ class OrderBookTest {
     private val dateTime = now()
 
     @Test
-    fun `Should create an order-book with sell-orders and buy-orders`() {
+    fun `Should create an order-book with sale-orders and purchase-orders`() {
         val orderBook = createOrderBook()
 
         assertEquals(4, orderBook.asks.size)
@@ -30,64 +30,78 @@ class OrderBookTest {
     }
 
     @Test
-    fun `Should find matching sell-orders for a given buy-order`() {
+    fun `Should find matching sale-orders for a given purchase-order`() {
         val orderBook = createOrderBook()
-        val buyOrder = Order(5, BUY, BigDecimal("200"), 5, now(), state = IN_TRADE)
+        val purchaseOrder = Order(
+            walletId = 5,
+            type = PURCHASE,
+            price = BigDecimal("200"),
+            size = 5,
+            creationDate = now(),
+            state = TRADING
+        )
 
-        val matchingSellOrders = orderBook.findMatchingOrders(buyOrder)
+        val matchingSaleOrders = orderBook.findMatchingOrders(purchaseOrder)
 
-        assertEquals(2, matchingSellOrders.size)
+        assertEquals(2, matchingSaleOrders.size)
 
-        assertEquals(2, matchingSellOrders[0].id)
-        assertEquals(1, matchingSellOrders[0].size)
-        assertEquals(2, matchingSellOrders[0].walletId)
-        assertEquals(BigDecimal("100"), matchingSellOrders[0].price)
-        assertEquals(IN_TRADE, matchingSellOrders[0].state)
-        assertEquals(SELL, matchingSellOrders[0].type)
-        assertEquals(dateTime.plusMinutes(2), matchingSellOrders[0].creationDate)
+        assertEquals(2, matchingSaleOrders[0].id)
+        assertEquals(1, matchingSaleOrders[0].size)
+        assertEquals(2, matchingSaleOrders[0].walletId)
+        assertEquals(BigDecimal("100"), matchingSaleOrders[0].price)
+        assertEquals(TRADING, matchingSaleOrders[0].state)
+        assertEquals(SALE, matchingSaleOrders[0].type)
+        assertEquals(dateTime.plusMinutes(2), matchingSaleOrders[0].creationDate)
 
-        assertEquals(1, matchingSellOrders[1].id)
-        assertEquals(5, matchingSellOrders[1].size)
-        assertEquals(1, matchingSellOrders[1].walletId)
-        assertEquals(BigDecimal("200"), matchingSellOrders[1].price)
-        assertEquals(IN_TRADE, matchingSellOrders[1].state)
-        assertEquals(SELL, matchingSellOrders[1].type)
-        assertEquals(dateTime.plusMinutes(3), matchingSellOrders[1].creationDate)
+        assertEquals(1, matchingSaleOrders[1].id)
+        assertEquals(5, matchingSaleOrders[1].size)
+        assertEquals(1, matchingSaleOrders[1].walletId)
+        assertEquals(BigDecimal("200"), matchingSaleOrders[1].price)
+        assertEquals(TRADING, matchingSaleOrders[1].state)
+        assertEquals(SALE, matchingSaleOrders[1].type)
+        assertEquals(dateTime.plusMinutes(3), matchingSaleOrders[1].creationDate)
     }
 
     @Test
-    fun `Should find matching buy-orders for a given sell-order`() {
+    fun `Should find matching purchase-orders for a given sale-order`() {
         val orderBook = createOrderBook()
-        val sellOrder = Order(5, SELL, BigDecimal("220"), 5, now(), state = IN_TRADE)
+        val saleOrder = Order(
+            walletId = 5,
+            type = SALE,
+            price = BigDecimal("220"),
+            size = 5,
+            creationDate = now(),
+            state = TRADING
+        )
 
-        val matchingBuyOrders = orderBook.findMatchingOrders(sellOrder)
+        val matchingPurchaseOrders = orderBook.findMatchingOrders(saleOrder)
 
-        assertEquals(3, matchingBuyOrders.size)
+        assertEquals(3, matchingPurchaseOrders.size)
 
-        assertEquals(4, matchingBuyOrders[0].id)
-        assertEquals(2, matchingBuyOrders[0].size)
-        assertEquals(4, matchingBuyOrders[0].walletId)
-        assertEquals(BigDecimal("355"), matchingBuyOrders[0].price)
-        assertEquals(IN_TRADE, matchingBuyOrders[0].state)
-        assertEquals(BUY, matchingBuyOrders[0].type)
-        assertEquals(dateTime.plusMinutes(1), matchingBuyOrders[0].creationDate)
+        assertEquals(4, matchingPurchaseOrders[0].id)
+        assertEquals(2, matchingPurchaseOrders[0].size)
+        assertEquals(4, matchingPurchaseOrders[0].walletId)
+        assertEquals(BigDecimal("355"), matchingPurchaseOrders[0].price)
+        assertEquals(TRADING, matchingPurchaseOrders[0].state)
+        assertEquals(PURCHASE, matchingPurchaseOrders[0].type)
+        assertEquals(dateTime.plusMinutes(1), matchingPurchaseOrders[0].creationDate)
 
-        assertEquals(2, matchingBuyOrders[1].id)
-        assertEquals(6, matchingBuyOrders[1].size)
-        assertEquals(2, matchingBuyOrders[1].walletId)
-        assertEquals(BigDecimal("220"), matchingBuyOrders[1].price)
-        assertEquals(IN_TRADE, matchingBuyOrders[1].state)
-        assertEquals(BUY, matchingBuyOrders[1].type)
-        assertEquals(dateTime.plusMinutes(2), matchingBuyOrders[1].creationDate)
+        assertEquals(2, matchingPurchaseOrders[1].id)
+        assertEquals(6, matchingPurchaseOrders[1].size)
+        assertEquals(2, matchingPurchaseOrders[1].walletId)
+        assertEquals(BigDecimal("220"), matchingPurchaseOrders[1].price)
+        assertEquals(TRADING, matchingPurchaseOrders[1].state)
+        assertEquals(PURCHASE, matchingPurchaseOrders[1].type)
+        assertEquals(dateTime.plusMinutes(2), matchingPurchaseOrders[1].creationDate)
 
-        assertEquals(3, matchingBuyOrders[2].id)
-        assertEquals(3, matchingBuyOrders[2].id)
-        assertEquals(7, matchingBuyOrders[2].size)
-        assertEquals(3, matchingBuyOrders[2].walletId)
-        assertEquals(BigDecimal("220"), matchingBuyOrders[2].price)
-        assertEquals(IN_TRADE, matchingBuyOrders[2].state)
-        assertEquals(BUY, matchingBuyOrders[2].type)
-        assertEquals(dateTime.plusMinutes(3), matchingBuyOrders[2].creationDate)
+        assertEquals(3, matchingPurchaseOrders[2].id)
+        assertEquals(3, matchingPurchaseOrders[2].id)
+        assertEquals(7, matchingPurchaseOrders[2].size)
+        assertEquals(3, matchingPurchaseOrders[2].walletId)
+        assertEquals(BigDecimal("220"), matchingPurchaseOrders[2].price)
+        assertEquals(TRADING, matchingPurchaseOrders[2].state)
+        assertEquals(PURCHASE, matchingPurchaseOrders[2].type)
+        assertEquals(dateTime.plusMinutes(3), matchingPurchaseOrders[2].creationDate)
     }
 
     private fun createOrderBook(): OrderBook {
@@ -97,37 +111,37 @@ class OrderBookTest {
                 Order(
                     id = 1,
                     walletId = 1,
-                    type = SELL,
+                    type = SALE,
                     price = BigDecimal("200"),
                     size = 5,
-                    state = IN_TRADE,
+                    state = TRADING,
                     creationDate = dateTime.plusMinutes(3)
                 ),
                 Order(
                     id = 2,
                     walletId = 2,
-                    type = SELL,
+                    type = SALE,
                     price = BigDecimal("100"),
                     size = 1,
-                    state = IN_TRADE,
+                    state = TRADING,
                     creationDate = dateTime.plusMinutes(2)
                 ),
                 Order(
                     id = 3,
                     walletId = 3,
-                    type = SELL,
+                    type = SALE,
                     price = BigDecimal("300"),
                     size = 2,
-                    state = IN_TRADE,
+                    state = TRADING,
                     creationDate = dateTime.plusMinutes(4)
                 ),
                 Order(
                     id = 4,
                     walletId = 4,
-                    type = SELL,
+                    type = SALE,
                     price = BigDecimal("300"),
                     size = 4,
-                    state = IN_TRADE,
+                    state = TRADING,
                     creationDate = dateTime.plusMinutes(1)
                 )
             ),
@@ -135,37 +149,37 @@ class OrderBookTest {
                 Order(
                     id = 1,
                     walletId = 1,
-                    type = BUY,
+                    type = PURCHASE,
                     price = BigDecimal("110"),
                     size = 4,
-                    state = IN_TRADE,
+                    state = TRADING,
                     creationDate = dateTime.plusMinutes(4)
                 ),
                 Order(
                     id = 2,
                     walletId = 2,
-                    type = BUY,
+                    type = PURCHASE,
                     price = BigDecimal("220"),
                     size = 6,
-                    state = IN_TRADE,
+                    state = TRADING,
                     creationDate = dateTime.plusMinutes(2)
                 ),
                 Order(
                     id = 3,
                     walletId = 3,
-                    type = BUY,
+                    type = PURCHASE,
                     price = BigDecimal("220"),
                     size = 7,
-                    state = IN_TRADE,
+                    state = TRADING,
                     creationDate = dateTime.plusMinutes(3)
                 ),
                 Order(
                     id = 4,
                     walletId = 4,
-                    type = BUY,
+                    type = PURCHASE,
                     price = BigDecimal("355"),
                     size = 2,
-                    state = IN_TRADE,
+                    state = TRADING,
                     creationDate = dateTime.plusMinutes(1)
                 )
             )

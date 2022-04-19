@@ -11,11 +11,11 @@ class OrderSchema(
     @field:GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
     @field:Enumerated(EnumType.STRING)
-    val type: Order.Type? = null,
-    val price: BigDecimal? = null,
-    val size: Int? = null,
-    val creationDate: LocalDateTime? = null,
-    val walletId: Long? = null,
+    val type: Order.Type,
+    val price: BigDecimal,
+    val size: Int,
+    val creationDate: LocalDateTime,
+    val walletId: Long,
     @field:Enumerated(EnumType.STRING)
-    val state: Order.State? = null
+    val state: Order.State
 )

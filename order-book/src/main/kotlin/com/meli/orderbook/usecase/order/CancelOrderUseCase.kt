@@ -20,7 +20,7 @@ abstract class CancelOrderUseCase(
     fun execute(input: Input) {
         log.info("m=execute, orderId=${input.orderId}")
 
-        val order = getSellOrder(input.orderId)
+        val order = getOrder(input.orderId)
         val wallet = walletQueryGateway.findById(order.walletId)
 
         cancelOrder(order, wallet)
@@ -29,7 +29,7 @@ abstract class CancelOrderUseCase(
         walletCommandGateway.update(wallet)
     }
 
-    private fun getSellOrder(orderId: Long): Order {
+    private fun getOrder(orderId: Long): Order {
         val order = orderQueryGateway.findById(orderId)
 
         validateOrder(order)

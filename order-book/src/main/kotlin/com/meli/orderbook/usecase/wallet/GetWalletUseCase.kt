@@ -1,9 +1,8 @@
 package com.meli.orderbook.usecase.wallet
 
 import com.meli.orderbook.entity.order.gateway.OrderQueryGateway
-import com.meli.orderbook.entity.order.model.Order
-import com.meli.orderbook.entity.order.model.Order.Type.BUY
-import com.meli.orderbook.entity.order.model.Order.Type.SELL
+import com.meli.orderbook.entity.order.model.Order.Type.PURCHASE
+import com.meli.orderbook.entity.order.model.Order.Type.SALE
 import com.meli.orderbook.entity.wallet.gateway.WalletQueryGateway
 import com.meli.orderbook.entity.wallet.model.Wallet
 import com.meli.orderbook.usecase.wallet.GetWalletUseCase.Output.InTrade
@@ -24,17 +23,17 @@ class GetWalletUseCase(
 
         val wallet = walletQueryGateway.findById(input.walletId)
 
-        val ordersInTrade = orderQueryGateway.findAllOrdersInTradeByWallet(wallet.id)
+        val ordersInTrade = orderQueryGateway.findAllOrdersInTradeByWalletId(wallet.id)
 
         var totalMoneyInTrade = BigDecimal.ZERO
         ordersInTrade
-            .filter { it.type == BUY }
+            .filter { it.type == PURCHASE }
             .map { it.price.multiply(it.size.toBigDecimal()) }
             .forEach { totalMoneyInTrade += it }
 
         var totalSizeInTrade = 0
         ordersInTrade
-            .filter { it.type == SELL }
+            .filter { it.type == SALE }
             .map { it.size }
             .forEach { totalSizeInTrade += it }
 

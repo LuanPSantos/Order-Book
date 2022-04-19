@@ -10,7 +10,7 @@ import javax.persistence.Id
 class WalletSchema(
     @field:Id
     @field:GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long,
+    val id: Long? = null,
     val amountOfMoney: BigDecimal,
     val amountOfVibranium: Int
 )

@@ -7,10 +7,9 @@ import com.meli.orderbook.entity.wallet.gateway.WalletQueryGateway
 import com.meli.orderbook.entity.wallet.model.Wallet
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import javax.transaction.Transactional
 
 @Service
-class CreateBuyOrderService(
+class CreatePurchaseOrderService(
     walletQueryGateway: WalletQueryGateway,
     walletCommandGateway: WalletCommandGateway,
     orderCommandGateway: OrderCommandGateway,

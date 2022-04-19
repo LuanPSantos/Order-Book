@@ -3,7 +3,6 @@ package com.meli.orderbook.usecase.order
 import com.meli.orderbook.entity.order.gateway.OrderBookQueryGateway
 import com.meli.orderbook.entity.order.gateway.OrderCommandGateway
 import com.meli.orderbook.entity.order.model.Order
-import com.meli.orderbook.entity.order.service.CreateOrderService
 import com.meli.orderbook.entity.trade.service.TradeService
 import org.slf4j.LoggerFactory
 import java.math.BigDecimal

@@ -1,8 +1,8 @@
 package com.meli.orderbook.usecase.order
 
-import com.meli.orderbook.entity.order.model.Order.State.IN_TRADE
-import com.meli.orderbook.entity.order.model.Order.Type.BUY
-import com.meli.orderbook.entity.order.model.Order.Type.SELL
+import com.meli.orderbook.entity.order.model.Order.State.TRADING
+import com.meli.orderbook.entity.order.model.Order.Type.PURCHASE
+import com.meli.orderbook.entity.order.model.Order.Type.SALE
 import com.meli.orderbook.entity.order.model.OrderBook
 import com.meli.orderbook.entity.order.gateway.OrderBookQueryGateway
 import com.meli.orderbook.entity.order.model.Order
@@ -41,18 +41,18 @@ class GetOrderBookUseCaseTest {
         assertEquals(1, output.orderBook.bids.size)
 
         assertEquals(1, output.orderBook.asks[0].id)
-        assertEquals(SELL, output.orderBook.asks[0].type)
+        assertEquals(SALE, output.orderBook.asks[0].type)
         assertEquals(BigDecimal("200"), output.orderBook.asks[0].price)
         assertEquals(dateTime, output.orderBook.asks[0].creationDate)
-        assertEquals(IN_TRADE, output.orderBook.asks[0].state)
+        assertEquals(TRADING, output.orderBook.asks[0].state)
         assertEquals(1, output.orderBook.asks[0].walletId)
         assertEquals(5, output.orderBook.asks[0].size)
 
         assertEquals(2, output.orderBook.bids[0].id)
-        assertEquals(BUY, output.orderBook.bids[0].type)
+        assertEquals(PURCHASE, output.orderBook.bids[0].type)
         assertEquals(BigDecimal("110"), output.orderBook.bids[0].price)
         assertEquals(dateTime, output.orderBook.bids[0].creationDate)
-        assertEquals(IN_TRADE, output.orderBook.bids[0].state)
+        assertEquals(TRADING, output.orderBook.bids[0].state)
         assertEquals(2, output.orderBook.bids[0].walletId)
         assertEquals(4, output.orderBook.bids[0].size)
 
@@ -62,10 +62,10 @@ class GetOrderBookUseCaseTest {
     private fun createOrderBook(): OrderBook {
         return OrderBook(
             listOf(
-                Order(1, SELL, BigDecimal("200"), 5, dateTime, IN_TRADE, 1)
+                Order(id = 1, walletId = 1, type =  SALE, price = BigDecimal("200"), size = 5, creationDate = dateTime, state = TRADING)
             ),
             listOf(
-                Order(2, BUY, BigDecimal("110"), 4, dateTime, IN_TRADE, 2)
+                Order(id = 2, walletId = 2, type = PURCHASE, price = BigDecimal("110"), size = 4, creationDate = dateTime, state = TRADING)
             )
         )
     }

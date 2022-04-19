@@ -3,8 +3,8 @@ package com.meli.orderbook.entity.trade.service
 import com.meli.orderbook.entity.order.gateway.OrderCommandGateway
 import com.meli.orderbook.entity.order.model.Order
 import com.meli.orderbook.entity.order.model.Order.Type
-import com.meli.orderbook.entity.order.model.Order.Type.BUY
-import com.meli.orderbook.entity.order.model.Order.Type.SELL
+import com.meli.orderbook.entity.order.model.Order.Type.PURCHASE
+import com.meli.orderbook.entity.order.model.Order.Type.SALE
 import com.meli.orderbook.entity.trade.gateway.TradeHistoryCommandGateway
 import com.meli.orderbook.entity.trade.model.Trade
 import com.meli.orderbook.entity.wallet.gateway.WalletCommandGateway
@@ -34,95 +34,95 @@ class TradeService(
             log.info("m=execute, matchedOrder=$matchedOrder")
             if (createdOrder.canTradeWith(matchedOrder)) {
                 when (createdOrder.type) {
-                    BUY -> execute(matchedOrder, createdOrder, createdOrder.type)
-                    SELL -> execute(createdOrder, matchedOrder, createdOrder.type)
+                    PURCHASE -> execute(matchedOrder, createdOrder, createdOrder.type)
+                    SALE -> execute(createdOrder, matchedOrder, createdOrder.type)
                 }
             }
         }
     }
 
-    private fun execute(sellOrder: Order, buyOrder: Order, transactionType: Type) {
+    private fun execute(saleOrder: Order, purchaseOrder: Order, transactionType: Type) {
         log.info("m=execute, transactionType=$transactionType")
 
-        val sellerWallet = walletQueryGateway.findById(sellOrder.walletId)
-        val buyerWallet = walletQueryGateway.findById(buyOrder.walletId)
+        val sellerWallet = walletQueryGateway.findById(saleOrder.walletId)
+        val buyerWallet = walletQueryGateway.findById(purchaseOrder.walletId)
 
-        val transactionedMoney = exchangeMoney(sellerWallet, buyerWallet, sellOrder, buyOrder)
-        val transactionedAssets = exchangeAsssets(buyerWallet, sellOrder, buyOrder)
+        val transactionedMoney = exchangeMoney(sellerWallet, buyerWallet, saleOrder, purchaseOrder)
+        val transactionedSize = exchangeAsssets(buyerWallet, saleOrder, purchaseOrder)
 
-        orderCommandGateway.update(sellOrder)
-        orderCommandGateway.update(buyOrder)
+        orderCommandGateway.update(saleOrder)
+        orderCommandGateway.update(purchaseOrder)
 
         walletCommandGateway.update(sellerWallet)
         walletCommandGateway.update(buyerWallet)
 
         tradeHistoryCommandGateway.register(
             Trade(
-                sellOrder.id!!,
-                buyOrder.id!!,
-                sellerWallet.id,
-                buyerWallet.id,
-                transactionType,
-                transactionedAssets,
-                transactionedMoney.price,
-                transactionedMoney.change
+                saleOrderId = saleOrder.id!!,
+                purchaseOrderId = purchaseOrder.id!!,
+                saleWalletId = sellerWallet.id,
+                purchaseWalletId = buyerWallet.id,
+                type = transactionType,
+                size = transactionedSize,
+                price = transactionedMoney.price,
+                change = transactionedMoney.change
             )
         )
     }
 
     private fun exchangeMoney(
-        sellerWallet: Wallet,
-        buyerWallet: Wallet,
-        sellOrder: Order,
-        buyOrder: Order
+        saleWallet: Wallet,
+        purchaseWallet: Wallet,
+        saleOrder: Order,
+        purchaseOrder: Order
     ): ExchangeMoneyResult {
 
-        return if (thereHasMoreToSellThanToBuy(sellOrder, buyOrder)) {
-            log.info("m=exchangeMoney, thereHasMoreToSellThanToBuy=true")
+        return if (thereIsMoreForSaleThanForPurchase(saleOrder, purchaseOrder)) {
+            log.info("m=exchangeMoney, thereIsMoreForSaleThanForPurchase=true")
 
             exchangeMoneyWithChange(
-                buyOrder.size,
-                sellerWallet,
-                buyerWallet,
-                sellOrder,
-                buyOrder
+                purchaseOrder.size,
+                saleWallet,
+                purchaseWallet,
+                saleOrder,
+                purchaseOrder
             )
         } else {
-            log.info("m=exchangeMoney, thereHasMoreToSellThanToBuy=false")
+            log.info("m=exchangeMoney, thereIsMoreForSaleThanForPurchase=false")
 
             exchangeMoneyWithChange(
-                sellOrder.size,
-                sellerWallet,
-                buyerWallet,
-                sellOrder,
-                buyOrder
+                saleOrder.size,
+                saleWallet,
+                purchaseWallet,
+                saleOrder,
+                purchaseOrder
             )
         }
     }
 
-    private fun exchangeAsssets(buyerWallet: Wallet, sellOrder: Order, buyOrder: Order): Int {
-        return if (thereHasMoreToSellThanToBuy(sellOrder, buyOrder)) {
-            log.info("m=exchangeAsssets, thereHasMoreToSellThanToBuy=true")
+    private fun exchangeAsssets(buyerWallet: Wallet, saleOrder: Order, purchaseOrder: Order): Int {
+        return if (thereIsMoreForSaleThanForPurchase(saleOrder, purchaseOrder)) {
+            log.info("m=exchangeAsssets, thereIsMoreForSaleThanForPurchase=true")
 
-            val buySize = buyOrder.subtractAllSize()
-            sellOrder.subractSize(buySize)
+            val purchaseSize = purchaseOrder.subtractAllSize()
+            saleOrder.subractSize(purchaseSize)
 
-            buyerWallet.depositVibranium(buySize)
+            buyerWallet.depositVibranium(purchaseSize)
 
-            log.info("m=exchangeAsssets, buySize=$buySize")
+            log.info("m=exchangeAsssets, purchaseSize=$purchaseSize")
 
-            buySize
+            purchaseSize
         } else {
-            log.info("m=exchangeAsssets, thereHasMoreToSellThanToBuy=false")
+            log.info("m=exchangeAsssets, thereIsMoreForSaleThanForPurchase=false")
 
-            val sellSize = sellOrder.subtractAllSize()
-            buyOrder.subractSize(sellSize)
+            val saleSize = saleOrder.subtractAllSize()
+            purchaseOrder.subractSize(saleSize)
 
-            buyerWallet.depositVibranium(sellSize)
+            buyerWallet.depositVibranium(saleSize)
 
-            log.info("m=exchangeAsssets, sellSize=$sellSize")
+            log.info("m=exchangeAsssets, saleSize=$saleSize")
 
-            sellSize
+            saleSize
         }
     }
 
@@ -130,19 +130,19 @@ class TradeService(
         size: Int,
         sellerWallet: Wallet,
         buyerWallet: Wallet,
-        sellOrder: Order,
-        buyOrder: Order
+        saleOrder: Order,
+        purchaseOrder: Order
     ): ExchangeMoneyResult {
         log.info("m=exchangeMoneyWithChange, size=$size")
         val result = ExchangeMoneyResult()
-        result.price = sellOrder.price
+        result.price = saleOrder.price
 
-        val totalInTransaction = sellOrder.price.multiply(size.toBigDecimal())
+        val totalInTransaction = saleOrder.price.multiply(size.toBigDecimal())
 
         sellerWallet.depositMoney(totalInTransaction)
 
-        if (buyOrder.price > sellOrder.price) {
-            val change = buyOrder.price - sellOrder.price
+        if (purchaseOrder.price > saleOrder.price) {
+            val change = purchaseOrder.price - saleOrder.price
             result.change = change
 
             val totalInChange = change.multiply(size.toBigDecimal())
@@ -155,8 +155,8 @@ class TradeService(
         return result
     }
 
-    private fun thereHasMoreToSellThanToBuy(sellOrder: Order, buyOrder: Order): Boolean {
-        return (sellOrder.size - buyOrder.size) > 0
+    private fun thereIsMoreForSaleThanForPurchase(saleOrder: Order, purchaseOrder: Order): Boolean {
+        return (saleOrder.size - purchaseOrder.size) > 0
     }
 
     data class ExchangeMoneyResult(

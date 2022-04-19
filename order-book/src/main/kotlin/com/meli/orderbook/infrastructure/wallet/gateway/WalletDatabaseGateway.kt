@@ -26,6 +26,10 @@ class WalletDatabaseGateway(
 
         val schema = walletRepository.findWalletById(id)
 
-        return Wallet(schema.id, schema.amountOfMoney, schema.amountOfVibranium)
+        return Wallet(
+            id = schema.id!!,
+            amountOfMoney = schema.amountOfMoney,
+            amountOfVibranium = schema.amountOfVibranium
+        )
     }
 }

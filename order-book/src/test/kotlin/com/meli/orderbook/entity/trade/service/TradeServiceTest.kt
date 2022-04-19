@@ -3,9 +3,9 @@ package com.meli.orderbook.entity.trade.service
 import com.meli.orderbook.entity.order.gateway.OrderCommandGateway
 import com.meli.orderbook.entity.order.model.Order
 import com.meli.orderbook.entity.order.model.Order.State.CLOSED
-import com.meli.orderbook.entity.order.model.Order.State.IN_TRADE
-import com.meli.orderbook.entity.order.model.Order.Type.BUY
-import com.meli.orderbook.entity.order.model.Order.Type.SELL
+import com.meli.orderbook.entity.order.model.Order.State.TRADING
+import com.meli.orderbook.entity.order.model.Order.Type.PURCHASE
+import com.meli.orderbook.entity.order.model.Order.Type.SALE
 import com.meli.orderbook.entity.trade.gateway.TradeHistoryCommandGateway
 import com.meli.orderbook.entity.trade.model.Trade
 import com.meli.orderbook.entity.wallet.gateway.WalletCommandGateway
@@ -51,8 +51,8 @@ class TradeServiceTest {
     fun `Should not execute the trade`() {
 
         tradeService.execute(
-            Order(2, BUY, BigDecimal("10"), 10, dateTime, IN_TRADE),
-            listOf(Order(1, SELL, BigDecimal("15"), 10, dateTime, IN_TRADE))
+            Order(id = 2, walletId = 2, type = PURCHASE, price = BigDecimal("10"), size = 10, creationDate = dateTime, state = TRADING),
+            listOf(Order(id = 1, walletId = 1, type = SALE, price = BigDecimal("15"), size = 10, creationDate = dateTime, state = TRADING))
         )
 
         verify(exactly = 0) { walletQueryGateway.findById(any()) }
@@ -67,12 +67,12 @@ class TradeServiceTest {
     fun `Should execute a trande`(
         sellerWallet: Wallet,
         buyerWallet: Wallet,
-        sellOrder: Order,
-        buyOrder: Order,
+        saleOrder: Order,
+        purchaseOrder: Order,
         expectedSellerWallet: Wallet,
         expectedBuyerWallet: Wallet,
-        expectedSellOrder: Order,
-        expectedBuyOrder: Order,
+        expectedSaleOrder: Order,
+        expectedPurchaseOrder: Order,
         expectedTrade: Trade
     ) {
         val walletsSlot = mutableListOf<Wallet>()
@@ -86,8 +86,8 @@ class TradeServiceTest {
         every { tradeHistoryCommandGateway.register(capture(tradeSlot)) } just Runs
 
         tradeService.execute(
-            sellOrder,
-            listOf(buyOrder)
+            saleOrder,
+            listOf(purchaseOrder)
         )
 
         verify(exactly = 1) { walletQueryGateway.findById(eq(sellerWallet.id)) }
@@ -106,32 +106,32 @@ class TradeServiceTest {
         assertEquals(expectedBuyerWallet.amountOfVibranium, buyerWalletCaptured?.amountOfVibranium)
         assertEquals(expectedBuyerWallet.amountOfMoney, buyerWalletCaptured?.amountOfMoney)
 
-        val sellOrderCaptured = ordersSlot.find { it.id == sellOrder.id }
-        assertEquals(expectedSellOrder.id, sellOrderCaptured?.id)
-        assertEquals(expectedSellOrder.walletId, sellOrderCaptured?.walletId)
-        assertEquals(expectedSellOrder.size, sellOrderCaptured?.size)
-        assertEquals(expectedSellOrder.creationDate, sellOrderCaptured?.creationDate)
-        assertEquals(expectedSellOrder.price, sellOrderCaptured?.price)
-        assertEquals(expectedSellOrder.type, sellOrderCaptured?.type)
-        assertEquals(expectedSellOrder.state, sellOrderCaptured?.state)
+        val saleOrderCaptured = ordersSlot.find { it.id == saleOrder.id }
+        assertEquals(expectedSaleOrder.id, saleOrderCaptured?.id)
+        assertEquals(expectedSaleOrder.walletId, saleOrderCaptured?.walletId)
+        assertEquals(expectedSaleOrder.size, saleOrderCaptured?.size)
+        assertEquals(expectedSaleOrder.creationDate, saleOrderCaptured?.creationDate)
+        assertEquals(expectedSaleOrder.price, saleOrderCaptured?.price)
+        assertEquals(expectedSaleOrder.type, saleOrderCaptured?.type)
+        assertEquals(expectedSaleOrder.state, saleOrderCaptured?.state)
 
-        val buyOrderCaptured = ordersSlot.find { it.id == buyOrder.id }
-        assertEquals(expectedBuyOrder.id, buyOrderCaptured?.id)
-        assertEquals(expectedBuyOrder.walletId, buyOrderCaptured?.walletId)
-        assertEquals(expectedBuyOrder.size, buyOrderCaptured?.size)
-        assertEquals(expectedBuyOrder.creationDate, buyOrderCaptured?.creationDate)
-        assertEquals(expectedBuyOrder.price, buyOrderCaptured?.price)
-        assertEquals(expectedBuyOrder.type, buyOrderCaptured?.type)
-        assertEquals(expectedBuyOrder.state, buyOrderCaptured?.state)
+        val purchaseOrderCaptured = ordersSlot.find { it.id == purchaseOrder.id }
+        assertEquals(expectedPurchaseOrder.id, purchaseOrderCaptured?.id)
+        assertEquals(expectedPurchaseOrder.walletId, purchaseOrderCaptured?.walletId)
+        assertEquals(expectedPurchaseOrder.size, purchaseOrderCaptured?.size)
+        assertEquals(expectedPurchaseOrder.creationDate, purchaseOrderCaptured?.creationDate)
+        assertEquals(expectedPurchaseOrder.price, purchaseOrderCaptured?.price)
+        assertEquals(expectedPurchaseOrder.type, purchaseOrderCaptured?.type)
+        assertEquals(expectedPurchaseOrder.state, purchaseOrderCaptured?.state)
 
         assertNull(tradeSlot.captured.id)
         assertEquals(expectedTrade.size, tradeSlot.captured.size)
         assertEquals(expectedTrade.price, tradeSlot.captured.price)
         assertEquals(expectedTrade.change, tradeSlot.captured.change)
-        assertEquals(expectedTrade.sellOrderId, tradeSlot.captured.sellOrderId)
-        assertEquals(expectedTrade.buyerOrderId, tradeSlot.captured.buyerOrderId)
-        assertEquals(expectedTrade.sellerWalletId, tradeSlot.captured.sellerWalletId)
-        assertEquals(expectedTrade.buyerWalletId, tradeSlot.captured.buyerWalletId)
+        assertEquals(expectedTrade.saleOrderId, tradeSlot.captured.saleOrderId)
+        assertEquals(expectedTrade.purchaseOrderId, tradeSlot.captured.purchaseOrderId)
+        assertEquals(expectedTrade.saleWalletId, tradeSlot.captured.saleWalletId)
+        assertEquals(expectedTrade.purchaseWalletId, tradeSlot.captured.purchaseWalletId)
         assertEquals(expectedTrade.type, tradeSlot.captured.type)
         assertNotNull(tradeSlot.captured.creationDate)
     }
@@ -142,111 +142,111 @@ class TradeServiceTest {
         @JvmStatic
         fun testScenarios(): Stream<Arguments> {
             return Stream.of(
-                `sell-trade where price matches and size metches`(),
-                `sell-trade where price matches and sell-size is greater than buy-size`(),
-                `sell-trade where price matches and sell-size is less than buy-size`(),
-                `sell-trade where sell-price is cheaper than buy-price and size are equal`(),
-                `sell-trade where sell-price is cheaper than buy-price and sell-size is greater than buy-size`(),
-                `sell-trade where sell-price is cheaper than buy-price and sell-size is less than buy-size`(),
-                `buy-trade where price matches and size metches`()
+                `sale-trade where price matches and size metches`(),
+                `sale-trade where price matches and sale-size is greater than purchase-size`(),
+                `sale-trade where price matches and sale-size is less than purchase-size`(),
+                `sale-trade where sale-price is cheaper than purchase-price and size are equal`(),
+                `sale-trade where sale-price is cheaper than purchase-price and sale-size is greater than purchase-size`(),
+                `sale-trade where sale-price is cheaper than purchase-price and sale-size is less than purchase-size`(),
+                `purchase-trade where price matches and size metches`()
             )
         }
 
-        private fun `sell-trade where price matches and size metches`(): Arguments {
+        private fun `sale-trade where price matches and size metches`(): Arguments {
             return arguments(
-                Wallet(1, BigDecimal("10"), 10),
-                Wallet(2, BigDecimal("10"), 10),
-                Order(1, SELL, BigDecimal("10"), 10, dateTime, IN_TRADE, 1),
-                Order(2, BUY, BigDecimal("10"), 10, dateTime, IN_TRADE, 2),
-                Wallet(1, BigDecimal("110"), 10),
-                Wallet(2, BigDecimal("10"), 20),
-                Order(1, SELL, BigDecimal("10"), 0, dateTime, CLOSED, 1),
-                Order(2, BUY, BigDecimal("10"), 0, dateTime, CLOSED, 2),
-                Trade(1, 2, 1, 2, SELL, 10, BigDecimal("10"), BigDecimal("0"), dateTime)
+                Wallet(id = 1, amountOfMoney = BigDecimal("10"), amountOfVibranium = 10),
+                Wallet(id = 2, amountOfMoney = BigDecimal("10"), amountOfVibranium = 10),
+                Order(id = 1, walletId = 1, type = SALE, price = BigDecimal("10"), size = 10, creationDate = dateTime, state = TRADING),
+                Order(id = 2, walletId = 2, type = PURCHASE, price = BigDecimal("10"), size = 10, creationDate = dateTime, state = TRADING),
+                Wallet(id = 1, amountOfMoney = BigDecimal("110"), amountOfVibranium = 10),
+                Wallet(id = 2, amountOfMoney = BigDecimal("10"), amountOfVibranium = 20),
+                Order(id = 1, walletId = 1, type = SALE, price = BigDecimal("10"), size = 0, creationDate = dateTime, state =  CLOSED),
+                Order(id = 2, walletId = 2, type = PURCHASE, price = BigDecimal("10"), size = 0, creationDate = dateTime, state =  CLOSED),
+                Trade(saleOrderId = 1, purchaseOrderId = 2, saleWalletId = 1, purchaseWalletId = 2, type = SALE, size = 10, price = BigDecimal("10"), change = BigDecimal("0"), creationDate = dateTime)
             )
         }
 
-        private fun `sell-trade where price matches and sell-size is greater than buy-size`(): Arguments {
+        private fun `sale-trade where price matches and sale-size is greater than purchase-size`(): Arguments {
             return arguments(
-                Wallet(1, BigDecimal("10"), 10),
-                Wallet(2, BigDecimal("10"), 10),
-                Order(1, SELL, BigDecimal("10"), 15, dateTime, IN_TRADE, 1),
-                Order(2, BUY, BigDecimal("10"), 10, dateTime, IN_TRADE, 2),
-                Wallet(1, BigDecimal("110"), 10),
-                Wallet(2, BigDecimal("10"), 20),
-                Order(1, SELL, BigDecimal("10"), 5, dateTime, IN_TRADE, 1),
-                Order(2, BUY, BigDecimal("10"), 0, dateTime, CLOSED, 2),
-                Trade(1, 2, 1, 2, SELL, 10, BigDecimal("10"), BigDecimal("0"), dateTime)
+                Wallet(id = 1, amountOfMoney = BigDecimal("10"), amountOfVibranium = 10),
+                Wallet(id = 2, amountOfMoney = BigDecimal("10"), amountOfVibranium = 10),
+                Order(id = 1, walletId = 1, type = SALE, price = BigDecimal("10"), size = 15, creationDate = dateTime, state = TRADING),
+                Order(id = 2, walletId = 2, type = PURCHASE, price = BigDecimal("10"), size = 10, creationDate = dateTime, state = TRADING),
+                Wallet(id = 1, amountOfMoney = BigDecimal("110"), amountOfVibranium = 10),
+                Wallet(id = 2, amountOfMoney = BigDecimal("10"), amountOfVibranium = 20),
+                Order(id = 1, walletId = 1, type = SALE, price = BigDecimal("10"), size = 5, creationDate = dateTime, state = TRADING),
+                Order(id = 2, walletId = 2, type = PURCHASE, price = BigDecimal("10"), size = 0, creationDate = dateTime, state = CLOSED),
+                Trade(saleOrderId = 1, purchaseOrderId = 2, saleWalletId = 1, purchaseWalletId = 2, type = SALE, size = 10, price = BigDecimal("10"), change = BigDecimal("0"), creationDate = dateTime)
             )
         }
 
-        private fun `sell-trade where price matches and sell-size is less than buy-size`(): Arguments {
+        private fun `sale-trade where price matches and sale-size is less than purchase-size`(): Arguments {
             return arguments(
-                Wallet(1, BigDecimal("10"), 10),
-                Wallet(2, BigDecimal("10"), 10),
-                Order(1, SELL, BigDecimal("10"), 10, dateTime, IN_TRADE, 1),
-                Order(2, BUY, BigDecimal("10"), 15, dateTime, IN_TRADE, 2),
-                Wallet(1, BigDecimal("110"), 10),
-                Wallet(2, BigDecimal("10"), 20),
-                Order(1, SELL, BigDecimal("10"), 0, dateTime, CLOSED, 1),
-                Order(2, BUY, BigDecimal("10"), 5, dateTime, IN_TRADE, 2),
-                Trade(1, 2, 1, 2, SELL, 10, BigDecimal("10"), BigDecimal("0"), dateTime)
+                Wallet(id = 1, amountOfMoney = BigDecimal("10"), amountOfVibranium = 10),
+                Wallet(id = 2, amountOfMoney = BigDecimal("10"), amountOfVibranium = 10),
+                Order(id = 1, walletId = 1, type = SALE, price = BigDecimal("10"), size = 10, creationDate = dateTime, state = TRADING),
+                Order(id = 2, walletId = 2, type = PURCHASE, price = BigDecimal("10"), size = 15, creationDate = dateTime, state = TRADING),
+                Wallet(id = 1, amountOfMoney = BigDecimal("110"), amountOfVibranium = 10),
+                Wallet(id = 2, amountOfMoney = BigDecimal("10"), amountOfVibranium = 20),
+                Order(id = 1, walletId = 1, type = SALE, price = BigDecimal("10"), size = 0, creationDate = dateTime, state = CLOSED),
+                Order(id = 2, walletId = 2, type = PURCHASE, price = BigDecimal("10"), size = 5, creationDate = dateTime, state = TRADING),
+                Trade(saleOrderId = 1, purchaseOrderId = 2, saleWalletId = 1, purchaseWalletId = 2, type = SALE, size = 10, price = BigDecimal("10"), change = BigDecimal("0"), creationDate = dateTime)
             )
         }
 
-        private fun `sell-trade where sell-price is cheaper than buy-price and size are equal`(): Arguments {
+        private fun `sale-trade where sale-price is cheaper than purchase-price and size are equal`(): Arguments {
             return arguments(
-                Wallet(1, BigDecimal("10"), 10),
-                Wallet(2, BigDecimal("10"), 10),
-                Order(1, SELL, BigDecimal("9"), 10, dateTime, IN_TRADE, 1),
-                Order(2, BUY, BigDecimal("10"), 10, dateTime, IN_TRADE, 2),
-                Wallet(1, BigDecimal("100"), 10),
-                Wallet(2, BigDecimal("20"), 20),
-                Order(1, SELL, BigDecimal("9"), 0, dateTime, CLOSED, 1),
-                Order(2, BUY, BigDecimal("10"), 0, dateTime, CLOSED, 2),
-                Trade(1, 2, 1, 2, SELL, 10, BigDecimal("9"), BigDecimal("1"), dateTime)
+                Wallet(id = 1, amountOfMoney = BigDecimal("10"), amountOfVibranium = 10),
+                Wallet(id = 2, amountOfMoney = BigDecimal("10"), amountOfVibranium = 10),
+                Order(id = 1, walletId = 1, type = SALE, price = BigDecimal("9"), size = 10, creationDate = dateTime, state = TRADING),
+                Order(id = 2, walletId = 2, type = PURCHASE, price = BigDecimal("10"), size = 10, creationDate = dateTime, state = TRADING),
+                Wallet(id = 1, amountOfMoney = BigDecimal("100"), amountOfVibranium = 10),
+                Wallet(id = 2, amountOfMoney = BigDecimal("20"), amountOfVibranium = 20),
+                Order(id = 1, walletId = 1, type = SALE, price = BigDecimal("9"), size = 0, creationDate = dateTime, state = CLOSED),
+                Order(id = 2, walletId = 2, type = PURCHASE, price = BigDecimal("10"), size = 0, creationDate = dateTime, state = CLOSED),
+                Trade(saleOrderId = 1, purchaseOrderId = 2, saleWalletId = 1, purchaseWalletId = 2, type = SALE, size = 10, price = BigDecimal("9"), change = BigDecimal("1"), creationDate = dateTime)
             )
         }
 
-        private fun `sell-trade where sell-price is cheaper than buy-price and sell-size is greater than buy-size`(): Arguments {
+        private fun `sale-trade where sale-price is cheaper than purchase-price and sale-size is greater than purchase-size`(): Arguments {
             return arguments(
-                Wallet(1, BigDecimal("10"), 10),
-                Wallet(2, BigDecimal("10"), 10),
-                Order(1, SELL, BigDecimal("9"), 15, dateTime, IN_TRADE, 1),
-                Order(2, BUY, BigDecimal("10"), 10, dateTime, IN_TRADE, 2),
-                Wallet(1, BigDecimal("100"), 10),
-                Wallet(2, BigDecimal("20"), 20),
-                Order(1, SELL, BigDecimal("9"), 5, dateTime, IN_TRADE, 1),
-                Order(2, BUY, BigDecimal("10"), 0, dateTime, CLOSED, 2),
-                Trade(1, 2, 1, 2, SELL, 10, BigDecimal("9"), BigDecimal("1"), dateTime)
+                Wallet(id = 1, amountOfMoney = BigDecimal("10"), amountOfVibranium = 10),
+                Wallet(id = 2, amountOfMoney = BigDecimal("10"), amountOfVibranium = 10),
+                Order(id = 1, walletId = 1, type = SALE, price = BigDecimal("9"), size = 15, creationDate = dateTime, state = TRADING),
+                Order(id = 2, walletId = 2, type = PURCHASE, price = BigDecimal("10"), size = 10, creationDate = dateTime, state = TRADING),
+                Wallet(id = 1, amountOfMoney = BigDecimal("100"), amountOfVibranium = 10),
+                Wallet(id = 2, amountOfMoney = BigDecimal("20"), amountOfVibranium = 20),
+                Order(id = 1, walletId = 1, type = SALE, price = BigDecimal("9"), size = 5, creationDate = dateTime, state = TRADING),
+                Order(id = 2, walletId = 2, type = PURCHASE, price = BigDecimal("10"), size = 0, creationDate =  dateTime, state = CLOSED),
+                Trade(saleOrderId = 1, purchaseOrderId = 2, saleWalletId = 1, purchaseWalletId = 2, type = SALE, size = 10, price = BigDecimal("9"), change = BigDecimal("1"), creationDate = dateTime)
             )
         }
 
-        private fun `sell-trade where sell-price is cheaper than buy-price and sell-size is less than buy-size`(): Arguments {
+        private fun `sale-trade where sale-price is cheaper than purchase-price and sale-size is less than purchase-size`(): Arguments {
             return arguments(
-                Wallet(1, BigDecimal("10"), 10),
-                Wallet(2, BigDecimal("10"), 10),
-                Order(1, SELL, BigDecimal("9"), 10, dateTime, IN_TRADE, 1),
-                Order(2, BUY, BigDecimal("10"), 15, dateTime, IN_TRADE, 2),
-                Wallet(1, BigDecimal("100"), 10),
-                Wallet(2, BigDecimal("20"), 20),
-                Order(1, SELL, BigDecimal("9"), 0, dateTime, CLOSED, 1),
-                Order(2, BUY, BigDecimal("10"), 5, dateTime, IN_TRADE, 2),
-                Trade(1, 2, 1, 2, SELL, 10, BigDecimal("9"), BigDecimal("1"), dateTime)
+                Wallet(id = 1, amountOfMoney = BigDecimal("10"), amountOfVibranium = 10),
+                Wallet(id = 2, amountOfMoney = BigDecimal("10"), amountOfVibranium = 10),
+                Order(id = 1, walletId = 1, type = SALE, price = BigDecimal("9"), size = 10, creationDate = dateTime, state = TRADING),
+                Order(id = 2, walletId = 2, type = PURCHASE, price = BigDecimal("10"), size = 15, creationDate = dateTime, state = TRADING),
+                Wallet(id = 1, amountOfMoney = BigDecimal("100"), amountOfVibranium = 10),
+                Wallet(id = 2, amountOfMoney = BigDecimal("20"), amountOfVibranium = 20),
+                Order(id = 1, walletId = 1, type = SALE, price = BigDecimal("9"), size = 0, creationDate =  dateTime, state = CLOSED),
+                Order(id = 2, walletId = 2, type = PURCHASE, price = BigDecimal("10"), size = 5, creationDate = dateTime, state = TRADING),
+                Trade(saleOrderId = 1, purchaseOrderId = 2, saleWalletId = 1, purchaseWalletId = 2, type = SALE, size = 10, price = BigDecimal("9"), change = BigDecimal("1"), creationDate = dateTime)
             )
         }
 
-        private fun `buy-trade where price matches and size metches`(): Arguments {
+        private fun `purchase-trade where price matches and size metches`(): Arguments {
             return arguments(
-                Wallet(2, BigDecimal("10"), 10),
-                Wallet(1, BigDecimal("10"), 10),
-                Order(2, BUY, BigDecimal("10"), 10, dateTime, IN_TRADE, 2),
-                Order(1, SELL, BigDecimal("10"), 10, dateTime, IN_TRADE, 1),
-                Wallet(2, BigDecimal("10"), 20),
-                Wallet(1, BigDecimal("110"), 10),
-                Order(2, BUY, BigDecimal("10"), 0, dateTime, CLOSED, 2),
-                Order(1, SELL, BigDecimal("10"), 0, dateTime, CLOSED, 1),
-                Trade(1, 2, 1, 2, BUY, 10, BigDecimal("10"), BigDecimal("0"), dateTime)
+                Wallet(id = 2, amountOfMoney = BigDecimal("10"), amountOfVibranium = 10),
+                Wallet(id = 1, amountOfMoney = BigDecimal("10"), amountOfVibranium = 10),
+                Order(id = 2, walletId = 2, type = PURCHASE, price = BigDecimal("10"), size = 10, creationDate = dateTime, state = TRADING),
+                Order(id = 1, walletId = 1, type = SALE, price = BigDecimal("10"), size = 10, creationDate = dateTime, state = TRADING),
+                Wallet(id = 2, amountOfMoney = BigDecimal("10"), amountOfVibranium = 20),
+                Wallet(id = 1, amountOfMoney = BigDecimal("110"), amountOfVibranium = 10),
+                Order(id = 2, walletId = 2, type = PURCHASE, price = BigDecimal("10"), size = 0, creationDate =  dateTime, state = CLOSED),
+                Order(id = 1, walletId = 1, type = SALE, price = BigDecimal("10"), size = 0, creationDate =  dateTime, state = CLOSED),
+                Trade(saleOrderId = 1, purchaseOrderId = 2, saleWalletId = 1, purchaseWalletId = 2, type = PURCHASE, size = 10, price = BigDecimal("10"), change = BigDecimal("0"), creationDate = dateTime)
             )
         }
 

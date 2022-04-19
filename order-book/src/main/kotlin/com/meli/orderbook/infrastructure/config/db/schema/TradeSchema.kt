@@ -10,14 +10,14 @@ class TradeSchema(
     @field:Id
     @field:GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
-    val sellOrderId: Long? = null,
-    val buyerOrderId: Long? = null,
-    val sellerWalletId: Long? = null,
-    val buyerWalletId: Long? = null,
+    val saleOrderId: Long,
+    val purchaseOrderId: Long,
+    val sellerWalletId: Long,
+    val buyerWalletId: Long,
     @field:Enumerated(EnumType.STRING)
-    val type: Order.Type? = null,
-    val size: Int? = null,
-    val price: BigDecimal? = null,
-    val changeMoney: BigDecimal? = null,
-    val creationDate: LocalDateTime? = null
+    val type: Order.Type,
+    val size: Int,
+    val price: BigDecimal,
+    val changeMoney: BigDecimal,
+    val creationDate: LocalDateTime
 )

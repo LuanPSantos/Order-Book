@@ -6,14 +6,14 @@ import java.time.LocalDateTime
 import java.time.LocalDateTime.now
 
 data class Trade(
-    val sellOrderId: Long,
-    val buyerOrderId: Long,
-    val sellerWalletId: Long,
-    val buyerWalletId: Long,
+    val id: Long? = null,
+    val saleOrderId: Long,
+    val purchaseOrderId: Long,
+    val saleWalletId: Long,
+    val purchaseWalletId: Long,
     val type: Order.Type,
     val size: Int,
     val price: BigDecimal,
     val change: BigDecimal,
-    val creationDate: LocalDateTime = now(),
-    val id: Long? = null
+    val creationDate: LocalDateTime = now()
 )

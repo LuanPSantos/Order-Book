@@ -4,9 +4,9 @@ import com.meli.orderbook.entity.order.gateway.OrderBookQueryGateway
 import com.meli.orderbook.entity.order.gateway.OrderCommandGateway
 import com.meli.orderbook.entity.order.gateway.OrderQueryGateway
 import com.meli.orderbook.entity.order.model.Order
-import com.meli.orderbook.entity.order.model.Order.State.IN_TRADE
-import com.meli.orderbook.entity.order.model.Order.Type.BUY
-import com.meli.orderbook.entity.order.model.Order.Type.SELL
+import com.meli.orderbook.entity.order.model.Order.State.TRADING
+import com.meli.orderbook.entity.order.model.Order.Type.PURCHASE
+import com.meli.orderbook.entity.order.model.Order.Type.SALE
 import com.meli.orderbook.entity.order.model.OrderBook
 import com.meli.orderbook.infrastructure.config.db.repository.OrderRepository
 import com.meli.orderbook.infrastructure.config.db.schema.OrderSchema
@@ -24,11 +24,31 @@ class OrderDatabaseGateway(
         log.info("m=get")
 
         val asks = orderRepository
-            .findOrdersByStateAndType(IN_TRADE, SELL)
-            .map { Order(it.walletId!!, SELL, it.price!!, it.size!!, it.creationDate!!, it.state!!, it.id) }
+            .findOrdersByStateAndType(TRADING, SALE)
+            .map {
+                Order(
+                    id = it.id,
+                    walletId = it.walletId,
+                    type = it.type,
+                    price = it.price,
+                    size = it.size,
+                    creationDate = it.creationDate,
+                    state = it.state
+                )
+            }
 
-        val bids = orderRepository.findOrdersByStateAndType(IN_TRADE, BUY)
-            .map { Order(it.walletId!!, BUY, it.price!!, it.size!!, it.creationDate!!, it.state!!, it.id) }
+        val bids = orderRepository.findOrdersByStateAndType(TRADING, PURCHASE)
+            .map {
+                Order(
+                    id = it.id,
+                    walletId = it.walletId,
+                    type = it.type,
+                    price = it.price,
+                    size = it.size,
+                    creationDate = it.creationDate,
+                    state = it.state
+                )
+            }
 
         return OrderBook(asks, bids)
     }
@@ -49,13 +69,13 @@ class OrderDatabaseGateway(
         )
 
         return Order(
-            schema.walletId!!,
-            schema.type!!,
-            schema.price!!,
-            schema.size!!,
-            schema.creationDate!!,
-            schema.state!!,
-            schema.id
+            id = schema.id,
+            walletId = schema.walletId,
+            type = schema.type,
+            price = schema.price,
+            size = schema.size,
+            creationDate = schema.creationDate,
+            state = schema.state
         )
     }
 
@@ -81,27 +101,27 @@ class OrderDatabaseGateway(
         val schema = orderRepository.findOrderById(orderId)
 
         return Order(
-            schema.walletId!!,
-            schema.type!!,
-            schema.price!!,
-            schema.size!!,
-            schema.creationDate!!,
-            schema.state!!,
-            schema.id
+            id = schema.id,
+            walletId = schema.walletId,
+            type = schema.type,
+            price = schema.price,
+            size = schema.size,
+            creationDate = schema.creationDate,
+            state = schema.state
         )
     }
 
-    override fun findAllOrdersInTradeByWallet(walletId: Long): List<Order> {
+    override fun findAllOrdersInTradeByWalletId(walletId: Long): List<Order> {
         return orderRepository.findAllOrdersInTradeByWallet(walletId)
             .map {
                 Order(
-                    it.walletId!!,
-                    it.type!!,
-                    it.price!!,
-                    it.size!!,
-                    it.creationDate!!,
-                    it.state!!,
-                    it.id
+                    id = it.id,
+                    walletId = it.walletId,
+                    type = it.type,
+                    price = it.price,
+                    size = it.size,
+                    creationDate = it.creationDate,
+                    state = it.state
                 )
             }
     }
