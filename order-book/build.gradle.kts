@@ -1,11 +1,13 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.springframework.boot.gradle.tasks.bundling.BootBuildImage
 
 plugins {
 	id("org.springframework.boot") version "2.6.6"
 	id("io.spring.dependency-management") version "1.0.11.RELEASE"
-	kotlin("jvm") version "1.6.10"
-	kotlin("plugin.spring") version "1.6.10"
-	kotlin("plugin.jpa") version "1.6.10"
+	kotlin("jvm") version "1.6.21"
+	kotlin("plugin.spring") version "1.6.21"
+	kotlin("plugin.jpa") version "1.6.21"
+	id("org.springframework.experimental.aot") version "0.11.4"
 	jacoco
 }
 
@@ -14,6 +16,7 @@ version = "0.0.1-SNAPSHOT"
 java.sourceCompatibility = JavaVersion.VERSION_17
 
 repositories {
+	maven { url = uri("https://repo.spring.io/release") }
 	mavenCentral()
 }
 
@@ -45,6 +48,11 @@ tasks.withType<Test> {
 	finalizedBy(tasks.jacocoTestReport)
 }
 
+tasks.withType<BootBuildImage> {
+	builder = "paketobuildpacks/builder:tiny"
+	environment = mapOf("BP_NATIVE_IMAGE" to "true")
+}
+
 tasks.jacocoTestReport {
 	dependsOn(tasks.test)
 	reports {
@@ -55,5 +63,5 @@ tasks.jacocoTestReport {
 }
 
 jacoco {
-    toolVersion = "0.8.7"
+	toolVersion = "0.8.7"
 }
