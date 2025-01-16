@@ -1,22 +1,24 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import org.springframework.boot.gradle.tasks.bundling.BootBuildImage
 
 plugins {
-	id("org.springframework.boot") version "2.6.6"
-	id("io.spring.dependency-management") version "1.0.11.RELEASE"
-	kotlin("jvm") version "1.6.21"
-	kotlin("plugin.spring") version "1.6.21"
-	kotlin("plugin.jpa") version "1.6.21"
-	id("org.springframework.experimental.aot") version "0.11.4"
-	jacoco
+	kotlin("jvm") version "1.9.25"
+	kotlin("plugin.spring") version "1.9.25"
+	id("org.springframework.boot") version "3.4.1"
+	id("io.spring.dependency-management") version "1.1.7"
+	id("org.hibernate.orm") version "6.6.4.Final"
+	id("org.graalvm.buildtools.native") version "0.10.4"
+	kotlin("plugin.jpa") version "1.9.25"
 }
 
 group = "com.meli"
 version = "0.0.1-SNAPSHOT"
-java.sourceCompatibility = JavaVersion.VERSION_17
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(21)
+	}
+}
 
 repositories {
-	maven { url = uri("https://repo.spring.io/release") }
 	mavenCentral()
 }
 
@@ -25,43 +27,31 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
-	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-
-	runtimeOnly("com.h2database:h2")
+	//runtimeOnly("com.h2database:h2")
 	runtimeOnly("org.mariadb.jdbc:mariadb-java-client")
-
-	testImplementation("org.springframework.boot:spring-boot-starter-test") {
-		exclude(module = "mockito-core")
-	}
-	testImplementation("io.mockk:mockk:1.12.3")
+	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
+	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
-tasks.withType<KotlinCompile> {
-	kotlinOptions {
-		freeCompilerArgs = listOf("-Xjsr305=strict")
-		jvmTarget = "17"
+kotlin {
+	compilerOptions {
+		freeCompilerArgs.addAll("-Xjsr305=strict")
 	}
+}
+
+hibernate {
+	enhancement {
+		enableAssociationManagement = true
+	}
+}
+
+allOpen {
+	annotation("jakarta.persistence.Entity")
+	annotation("jakarta.persistence.MappedSuperclass")
+	annotation("jakarta.persistence.Embeddable")
 }
 
 tasks.withType<Test> {
 	useJUnitPlatform()
-	finalizedBy(tasks.jacocoTestReport)
-}
-
-tasks.withType<BootBuildImage> {
-	builder = "paketobuildpacks/builder:tiny"
-	environment = mapOf("BP_NATIVE_IMAGE" to "true")
-}
-
-tasks.jacocoTestReport {
-	dependsOn(tasks.test)
-	reports {
-		xml.required.set(false)
-		csv.required.set(false)
-		html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml"))
-	}
-}
-
-jacoco {
-	toolVersion = "0.8.7"
 }

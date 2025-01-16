@@ -1,15 +1,4 @@
 services:
-  order-book:
-    image: on-luan/order-book
-    build:
-      context: .
-    container_name: order-book
-    ports:
-      - 8081:80
-    entrypoint: java -jar -Dspring.profiles.active=prod ./app.jar
-    networks:
-      - order-book-network
-
   order-book-db:
     image: mariadb:latest
     command: --innodb-use-native-aio=0
@@ -25,6 +14,29 @@ services:
       - MYSQL_ROOT_PASSWORD=root
     networks:
       - order-book-network
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1024MB
+    ports:
+      - 3306:3306
+
+  order-book:
+    restart: always
+    image: on-luan/order-book
+    build:
+      context: .
+    container_name: order-book
+    ports:
+      - 8081:80
+    networks:
+      - order-book-network
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1024MB
 
 volumes:
   order-book-db:

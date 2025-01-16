@@ -14,7 +14,7 @@ interface OrderRepository : JpaRepository<OrderSchema, Long> {
                 "WHERE order.state = :state " +
                 "AND order.type = :type"
     )
-    fun findOrdersByStateAndType(state: State, type: Order.Type): List<OrderSchema>
+    fun findOrdersByStateAndType(state: State, type: Order.Type): java.util.List<OrderSchema>
 
     @Query(
         "SELECT order FROM OrderSchema order " +
@@ -27,6 +27,6 @@ interface OrderRepository : JpaRepository<OrderSchema, Long> {
                 "WHERE order.walletId = :walletId " +
                 "AND order.state = :state"
     )
-    fun findAllOrdersInTradeByWallet(walletId: Long, state: State = TRADING): List<OrderSchema>
+    fun findAllOrdersInTradeByWallet(walletId: Long, state: State = TRADING): java.util.List<OrderSchema>
 
 }

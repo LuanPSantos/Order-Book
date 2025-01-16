@@ -1,15 +1,15 @@
-FROM gradle:7.4-jdk17 AS Builder
+FROM gradle:8-jdk21-graal AS Builder
 
 WORKDIR /app/order-book
 
 COPY --chown=gradle:gradle . .
 
-RUN gradle clean build --no-daemon
+RUN gradle nativeCompile
 
-FROM openjdk:17.0.2-jdk-oracle
+FROM ubuntu:latest
 
 WORKDIR /app/order-book
 
-COPY --from=Builder /app/order-book/build/libs/order-book*.jar app.jar
+COPY --from=Builder /app/order-book/build/native/nativeCompile/* .
 
-CMD ["java", "-jar", "./app.jar"]
+CMD ["./order-book"]

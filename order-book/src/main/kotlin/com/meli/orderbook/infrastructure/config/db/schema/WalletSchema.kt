@@ -1,10 +1,7 @@
 package com.meli.orderbook.infrastructure.config.db.schema
 
+import jakarta.persistence.*
 import java.math.BigDecimal
-import javax.persistence.Entity
-import javax.persistence.GeneratedValue
-import javax.persistence.GenerationType
-import javax.persistence.Id
 
 @Entity
 class WalletSchema(

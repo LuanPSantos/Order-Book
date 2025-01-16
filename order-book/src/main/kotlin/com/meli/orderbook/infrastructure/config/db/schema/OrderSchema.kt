@@ -1,9 +1,9 @@
 package com.meli.orderbook.infrastructure.config.db.schema
 
 import com.meli.orderbook.entity.order.model.Order
+import jakarta.persistence.*
 import java.math.BigDecimal
 import java.time.LocalDateTime
-import javax.persistence.*
 
 @Entity
 class OrderSchema(
