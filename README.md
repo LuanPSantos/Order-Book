@@ -1,9 +1,11 @@
+
 # Native
 
 https://medium.com/javarevisited/current-state-of-spring-boot-native-with-kotlin-graalvm-699b1812cc65
 https://docs.spring.io/spring-boot/docs/3.2.3/reference/html/native-image.html
 
 Como selecionar melhor os profiles? (deixar default prod pode ser perigoso)
+
 
 # Order-Book
 
@@ -18,13 +20,13 @@ Quando um ofeta de compra encontra uma ofeta de venda compatível (ou vice-versa
 **1 - Faça do clone deste repositório**  
 
 ``
-git clone https://github.com/LuanPSantos/Meli-Order-Book.git
+git clone https://github.com/LuanPSantos/Order-Book.git
 ``
 
 **2 - Navegue até o diretório raíz do projeto** 
 
 ``
-cd Meli-Order-Book/order-book
+cd Order-Book/order-book
 ``
 
 **3 - Rode o seguinte comando:**  
@@ -35,7 +37,7 @@ docker-compose up -d --build
 
 **4 - Importe a seguinte Postman Collection:**  
 
-[Order-Book-Postman-Collection](https://github.com/LuanPSantos/Meli-Order-Book/blob/main/postman/Order%20Book.postman_collection.json)
+[Order-Book-Postman-Collection](https://github.com/LuanPSantos/Order-Book/blob/main/postman/Order%20Book.postman_collection.json)
 
 **5 - Utilize os seguintes Wallet-IDs para realizar as operações**
 - walletId: 1  
