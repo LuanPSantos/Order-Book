@@ -1,4 +1,4 @@
-# Meli Order-Book
+# Order-Book
 
 Em um Order Book ou Livro de ofertas contém as ofertas de compra e venda para um determinado ativo (Vibranium).
 Ao realizar uma oferta de venda, a quantidade ofertada é subtraída da carteira e entra em trade com valor requerido pelo vendedor.
@@ -11,13 +11,13 @@ Quando um ofeta de compra encontra uma ofeta de venda compatível (ou vice-versa
 **1 - Faça do clone deste repositório**  
 
 ``
-git clone https://github.com/LuanPSantos/Meli-Order-Book.git
+git clone https://github.com/LuanPSantos/Order-Book.git
 ``
 
 **2 - Navegue até o diretório raíz do projeto** 
 
 ``
-cd Meli-Order-Book/order-book
+cd Order-Book/order-book
 ``
 
 **3 - Rode o seguinte comando:**  
@@ -28,7 +28,7 @@ docker-compose up -d --build
 
 **4 - Importe a seguinte Postman Collection:**  
 
-[Order-Book-Postman-Collection](https://github.com/LuanPSantos/Meli-Order-Book/blob/main/postman/Order%20Book.postman_collection.json)
+[Order-Book-Postman-Collection](https://github.com/LuanPSantos/Order-Book/blob/main/postman/Order%20Book.postman_collection.json)
 
 **5 - Utilize os seguintes Wallet-IDs para realizar as operações**
 - walletId: 1  
