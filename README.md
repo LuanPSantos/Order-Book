@@ -1,3 +1,12 @@
+
+# Native
+
+https://medium.com/javarevisited/current-state-of-spring-boot-native-with-kotlin-graalvm-699b1812cc65
+https://docs.spring.io/spring-boot/docs/3.2.3/reference/html/native-image.html
+
+Como selecionar melhor os profiles? (deixar default prod pode ser perigoso)
+
+
 # Order-Book
 
 Em um Order Book ou Livro de ofertas contém as ofertas de compra e venda para um determinado ativo (Vibranium).
