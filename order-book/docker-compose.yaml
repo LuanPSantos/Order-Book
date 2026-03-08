@@ -24,7 +24,7 @@ services:
 
   order-book:
     restart: always
-    image: on-luan/order-book
+    image: docker.io/library/order-book:0.0.1-SNAPSHOT
     build:
       context: .
     container_name: order-book

@@ -3,6 +3,7 @@
 
 https://medium.com/javarevisited/current-state-of-spring-boot-native-with-kotlin-graalvm-699b1812cc65
 https://docs.spring.io/spring-boot/docs/3.2.3/reference/html/native-image.html
+https://github.com/oracle/graal/blob/master/docs/reference-manual/native-image/BuildOutput.md
 
 Como selecionar melhor os profiles? (deixar default prod pode ser perigoso)
 

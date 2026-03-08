@@ -1,4 +1,4 @@
-FROM gradle:8-jdk21-graal AS Builder
+FROM paketobuildpacks/builder-jammy-java-tiny:latest AS Builder
 
 WORKDIR /app/order-book
 
@@ -6,7 +6,7 @@ COPY --chown=gradle:gradle . .
 
 RUN gradle nativeCompile
 
-FROM ubuntu:latest
+FROM ubuntu/glibc2.35-0ubuntu3.8
 
 WORKDIR /app/order-book
 
